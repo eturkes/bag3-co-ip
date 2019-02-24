@@ -14,4 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# watson-drug-discovery-analyses
+# Watson Drug Discovery Analyses
+
+Various analyses using IBM Watson for Drug Discovery
