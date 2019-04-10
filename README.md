@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Watson Drug Discovery Analyses
-#### *All analyses are currently incomplete*
+# BAG3 Co-IP MS Analysis
+#### *This analysis is currently incomplete*
 
-Various analyses using IBM Watson for Drug Discovery
+Analysis of BAG3 Co-IP MS data
