@@ -44,3 +44,11 @@ knit: (
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+This is a broad analysis that prepares and characterizes the data to answer questions within other projects and may be present as a Git submodule in those projects.
+The background for this data is as follows:
+
+- Co-IP MS (co-immunoprecipitation mass spectroscopy) using BAG3 as bait.
+- scrRNA control and shBAG3 to knockdown BAG3 to examine BAG3 specific interactions.
+- Approximately 90% efficient knockdown.
+- Single replicate of mature rat primary cortical neurons (DIV 24).
