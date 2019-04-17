@@ -48,6 +48,7 @@ library("readxl")
 library("DT")
 library("devtools")
 library("data.table")
+library("plyr")
 ```
 
 *This is a broad analysis that prepares and characterizes the data to answer more specific questions in other projects and is intended to be imported as a Git submodule in those repositories.*
@@ -70,6 +71,26 @@ dt <- data.table(
         "../gdrive/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
         )
 )
+
+DT::datatable(dt)
+```
+
+# Data cleaning
+
+We can reduce the amount of information to those most relevant for validating a Co-IP experiment.
+
+```{r data_cleaning, include = TRUE, echo = FALSE}
+# Select columns.
+cols <- c("Genes", "Abundance Ratio: Scr/SH", "scrRNA Abundance", "shBAG3 Abundance")
+
+# Rename and remove columns.
+dt <- plyr::rename(dt,
+                   c("Description" = cols[1],
+                     "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
+                     "Scr Abundances" = cols[3],
+                     "SH Abundances" = cols[4])
+)
+
 DT::datatable(dt)
 ```
 
