@@ -43,12 +43,6 @@ knit: (
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-library("readxl")
-library("DT")
-library("devtools")
-library("data.table")
-library("plyr")
 ```
 
 *This is a broad analysis that prepares and characterizes the data to answer more specific questions in other projects and is intended to be imported as a Git submodule in those repositories.*
@@ -66,8 +60,8 @@ First, let's take a look at the raw data output from Proteome Discoverer.
 The data is unmodified but some columns have been lightly edited outside of R for easier import.
 
 ```{r raw_data, include = TRUE, echo = FALSE}
-dt <- data.table(
-    read_excel(
+dt <- data.table::data.table(
+    readxl::read_excel(
         "../gdrive/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
         )
 )
