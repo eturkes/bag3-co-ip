@@ -123,6 +123,21 @@ Source: CRAN
 Version: 0.6.18
 Hash: 65f62365ec69ddd17230d2ffe891a6ab
 
+Package: eturkesRutils
+Source: github
+Version: 0.1.0
+Hash: 6145b5a7f15cdd33cc82fb178b4bd9c3
+Requires: DT
+GithubRepo: eturkesRutils
+GithubUsername: eturkes
+GithubRef: master
+GithubSha1: 07b0d289bad0b6bedfb206c4d2f0a13859a3bc7f
+RemoteHost: api.github.com
+RemoteRepo: eturkesRutils
+RemoteUsername: eturkes
+RemoteRef: master
+RemoteSha: 07b0d289bad0b6bedfb206c4d2f0a13859a3bc7f
+
 Package: evaluate
 Source: CRAN
 Version: 0.13
