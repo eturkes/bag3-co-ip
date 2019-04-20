@@ -126,17 +126,17 @@ Hash: 65f62365ec69ddd17230d2ffe891a6ab
 Package: eturkesRutils
 Source: github
 Version: 0.1.0
-Hash: 6145b5a7f15cdd33cc82fb178b4bd9c3
+Hash: b12a0e5b686f6341bbabcf1ea3021a04
 Requires: DT
 GithubRepo: eturkesRutils
 GithubUsername: eturkes
 GithubRef: master
-GithubSha1: 07b0d289bad0b6bedfb206c4d2f0a13859a3bc7f
+GithubSha1: 0cb99b6c9604e235950c429744c117186e085cc3
 RemoteHost: api.github.com
 RemoteRepo: eturkesRutils
 RemoteUsername: eturkes
 RemoteRef: master
-RemoteSha: 07b0d289bad0b6bedfb206c4d2f0a13859a3bc7f
+RemoteSha: 0cb99b6c9604e235950c429744c117186e085cc3
 
 Package: evaluate
 Source: CRAN
