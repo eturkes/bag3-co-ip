@@ -21,6 +21,51 @@ knit: (
     )
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<style type="text/css">
+
+body{ /* Normal  */
+  font-size: 16px;
+}
+h1.title {
+  font-size: 35px;
+}
+h1 { /* Header 1 */
+  font-size: 24px;
+}
+h2 { /* Header 2 */
+  font-size: 22px;
+}
+h3 { /* Header 3 */
+  font-size: 20px;
+}
+.toc-content {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+div.tocify {
+  width: 100%;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+.tocify-subheader .tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 35px;
+  text-indent: 0;
+}
+div.main-container {
+  max-width: none;
+  width: 100%;
+}
+
+</style>
+
 ```{r license, include = FALSE}
 #    This file is part of bag3-co-ip.
 #    Copyright (C) 2019  Emir Turkes
@@ -39,10 +84,6 @@ knit: (
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #    Emir Turkes can be contacted at eturkes@bu.edu
-```
-
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 *This is a broad analysis that prepares and characterizes the data to answer more specific questions in other projects and is intended to be imported as a Git submodule in those repositories.*
