@@ -22,6 +22,24 @@ knit: (
 ---
 
 ```{r setup, include = FALSE}
+#    This file is part of bag3-co-ip.
+#    Copyright (C) 2019  Emir Turkes
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    Emir Turkes can be contacted at eturkes@bu.edu
+
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -65,26 +83,6 @@ div.main-container {
 }
 
 </style>
-
-```{r license, include = FALSE}
-#    This file is part of bag3-co-ip.
-#    Copyright (C) 2019  Emir Turkes
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#    Emir Turkes can be contacted at eturkes@bu.edu
-```
 
 *This is a broad analysis that prepares and characterizes the data to answer more specific questions in other projects and is intended to be imported as a Git submodule in those repositories.*
 
