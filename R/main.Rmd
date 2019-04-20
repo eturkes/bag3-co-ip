@@ -15,7 +15,7 @@ knit: (
         rmarkdown::render(
             inputFile,
             encoding = encoding,
-            output_file = "../gdrive/results/bag3-co-ip-analysis.html"
+            output_file = "../results/bag3-co-ip-analysis.html"
             )
         }
     )
@@ -65,7 +65,7 @@ First, let's take a look at the raw data output from Proteome Discoverer. The da
 
 ```{r raw_data, include = TRUE, echo = TRUE}
 dt <- data.table::data.table(readxl::read_excel(
-    "../gdrive/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
+    "../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
     )
 )
 
@@ -88,11 +88,52 @@ dt <- plyr::rename(dt,
 )
 dt <- dt[, cols, with = FALSE]
 
-# Extract gene names from the "Genes" column.
-dt$Genes <- stringr::str_extract(dt$Genes, "(?<=GN=).*(?= PE=)")
+# Extract gene names from the "Genes" column, removing entries that lack a name.
+# This is only an intermediary step, the column of genes are then fed into IBM Watson and converted
+# into Watson entities.
+# The column of genes are then replaced with the Watson entities to facilitate easy comparison.
+# This is done manually, as there is currently no Watson for Drug Discovery API.
+dt[[cols[1]]] <- stringr::str_extract(dt[[cols[1]]], "(?<=GN=).*(?= PE=)")
+dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
+watson_genes <- data.table::fread(
+    "../watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv"
+    )
+dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
 eturkesRutils::datatable(dt)
 ```
+
+## Sort schemes {.tabset}
+
+We explore the two most relevant sorting schemes:
+
+- Specificity with BAG3
+- Abundance of protein
+
+### Specificity with BAG3
+
+```{r specificity_with_bag3, include = TRUE, echo = TRUE}
+dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_spec)
+```
+
+### Abundance of protein
+
+```{r abundance_of_protein, include = TRUE, echo = TRUE}
+dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_abun)
+```
+
+# Statistical filtering
+
+Due to several limitations of this dataset, it is unreliable to gleam insights from the results thus far.
+Nonetheless, there exists statistical techniques that are suitable for further filtering the data.
+
+## Missing value imputation
+
+
 
 # Session info
 
