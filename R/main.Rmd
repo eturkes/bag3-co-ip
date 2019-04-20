@@ -54,12 +54,12 @@ The background for this data is as follows:
 - Approximately 90% efficient knockdown.
 - Single replicate of mature rat primary cortical neurons (DIV 24).
 
-# Final results
+# Final Results
 
 If you are not interested in the methods leading to the final results of this analysis, just check this section.
 Otherwise, continue on.
 
-# Raw data
+# Raw Data
 
 First, let's take a look at the raw data output from Proteome Discoverer. The data is unmodified but some columns have been lightly edited outside of R for easier import.
 
@@ -72,7 +72,7 @@ dt <- data.table::data.table(readxl::read_excel(
 eturkesRutils::datatable(dt)
 ```
 
-# Basic cleaning
+# Basic Cleaning
 
 Next, we do some very basic modifications that affect the presentation of the data but make no alterations to the data itself (aside from basic transformation) nor produce new data.
 In best case scenarios, these modifications are enough to conclude a project of this scope.
@@ -103,7 +103,7 @@ dt[[cols[1]]] <- watson_genes[["Entity name"]]
 eturkesRutils::datatable(dt)
 ```
 
-## Sort schemes {.tabset}
+## Sort Schemes {.tabset}
 
 We explore the two most relevant sorting schemes:
 
@@ -118,7 +118,7 @@ dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 eturkesRutils::datatable(dt_spec)
 ```
 
-### Abundance of protein
+### Abundance of Protein
 
 ```{r abundance_of_protein, include = TRUE, echo = TRUE}
 dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
@@ -126,16 +126,16 @@ dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 eturkesRutils::datatable(dt_abun)
 ```
 
-# Statistical filtering
+# Statistical Filtering
 
 Due to several limitations of this dataset, it is unreliable to gleam insights from the results thus far.
 Nonetheless, there exists statistical techniques that are suitable for further filtering the data.
 
-## Missing value imputation
+## Missing Value Imputation
 
 
 
-# Session info
+# Session Info
 
 ```{r session_info, include = TRUE, echo = TRUE}
 devtools::session_info()
