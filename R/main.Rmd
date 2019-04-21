@@ -38,7 +38,9 @@ knit: (
 
 knitr::opts_chunk$set(echo = TRUE)
 
-library("magrittr")
+# TODO:
+# Remove "docxtools" package.
+# Remove "magrittr" package.
 ```
 
 <style type="text/css">
@@ -135,12 +137,23 @@ dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
 watson_genes <- data.table::fread("../watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv")
 dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
-dt <- docxtools::format_engr(dt)
+# Format numbers.
+#dt[[cols[2]]] <- as.numeric(formatC(dt[[cols[2]]], format = "f", digits = 2))
+#dt[[cols[3]]] <- formatC(dt[[cols[3]]], format = "e", digits = 2)
+#dt[[cols[4]]] <- formatC(dt[[cols[4]]], format = "e", digits = 2)
 
-knitr::kable(dt)
-
-#eturkesRutils::datatable(dt)
-#    DT::formatRound(cols[4], digits = 2)
+DT::datatable(dt, options = list(
+    rowCallback = DT::JS(
+        "function(row, data) {",
+        "for (i = 1; i < data.length; i++) {",
+        "if (data[i]>1000 | data[i]<1){",
+        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
+        "}",
+        "}",
+        "}"
+        )
+    )
+)
 ```
 
 ## Sort Schemes {.tabset}
@@ -150,17 +163,17 @@ The above table does not appear to be straightforwardly sorted by any of the col
 ### Specificity with BAG3
 
 ```{r specificity_with_bag3, include = TRUE, echo = TRUE}
-#dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
+dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 
-#eturkesRutils::datatable(dt_spec)
+eturkesRutils::datatable(dt_spec)
 ```
 
 ### Abundance of Protein
 
 ```{r abundance_of_protein, include = TRUE, echo = TRUE}
-#dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
+dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 
-#eturkesRutils::datatable(dt_abun)
+eturkesRutils::datatable(dt_abun)
 ```
 
 # Statistical Filtering
