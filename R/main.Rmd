@@ -2,6 +2,7 @@
 title: "BAG3 Co-IP MS Analysis"
 author: "Emir Turkes"
 date: '`r strftime(Sys.time(), format = "%B %d, %Y")`'
+bibliography: "../bag3-co-ip.bib"
 output:
     html_document:
         number_sections: true
@@ -94,17 +95,16 @@ The background for this data is as follows:
 - Approximately 90% efficient knockdown.
 - Single replicate of mature rat primary cortical neurons (DIV 24).
 
-# Final Results
+# Final Results {-}
 
 Read just this section for the final results of the analysis and a summary of the methods.
-Later sections breakdown the methods.
 
-# Raw Data
+# Original Data {-}
 
-First, let's take a look at the raw data output from Proteome Discoverer.
+This section contains the original data received from the mass spec facility and was mainly processed using Proteome Discoverer from Thermo Fisher.
 The table below is unedited except for minimal formatting outside of R for easier import.
 
-```{r raw_data, include = TRUE, echo = TRUE}
+```{r raw_data, include = TRUE, echo = FALSE}
 dt <- data.table::data.table(readxl::read_excel(
   "../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
@@ -128,12 +128,20 @@ DT::datatable(
 )
 ```
 
+# Breakdown of Methods {-}
+
+The following sections breakdown the methods used to transform the contents in "Original Data" to those in "Final Results".
+
 # Preliminary Cleaning
 
-Next, we do some very basic modifications that improve presentation of the table without any data manipulation.
+First, we do some very basic modifications that improve presentation of the table without any data manipulation.
 In best case scenarios, this may be all that is needed.
 
 ```{r basic_cleaning, include = TRUE, echo = TRUE}
+dt <- data.table::data.table(readxl::read_excel(
+  "../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
+))
+
 # Rename and reduce columns.
 cols <- c(
     "Genes",
@@ -203,6 +211,8 @@ The data wrangling thus far reveals several issues that we will attempt to tackl
 
 ## Missing Value Imputation
 
+There are a handful of methods for addressing missing values in metabolomics data, which were reviewed and compared in [@wei_missing_2018].
+
 ## Removal of Maximum Threshold
 
 ## Renormalization
@@ -214,3 +224,5 @@ The data wrangling thus far reveals several issues that we will attempt to tackl
 ```{r session_info, include = TRUE, echo = TRUE}
 devtools::session_info()
 ```
+
+# References
