@@ -160,11 +160,12 @@ eturkesRutils::datatable(dt) %>%
 
 ## Sort Schemes {.tabset}
 
-The above table does not appear to be straightforwardly sorted by any of the columns. So, we explore sorting schemes most relevant to this dataset. The schemes can be cycled through the tabs below.
+The above table does not appear to be sorted in any obvious way. So, we explore sorting schemes most relevant to this dataset. The schemes can be cycled through the tabs below.
 
 ### Specificity with BAG3
 
 ```{r specificity_with_bag3, include = TRUE, echo = TRUE}
+# Secondary sorted by "shBAG3 Abundance" ascending.
 dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_spec) %>%
@@ -174,6 +175,7 @@ eturkesRutils::datatable(dt_spec) %>%
 ### Abundance of Protein
 
 ```{r abundance_of_protein, include = TRUE, echo = TRUE}
+# Secondary sorted by "shBAG3 Abundance" descending.
 dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_abun) %>%
