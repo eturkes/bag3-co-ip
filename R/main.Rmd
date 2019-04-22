@@ -128,7 +128,7 @@ DT::datatable(
 )
 ```
 
-# Basic Cleaning
+# Preliminary Cleaning
 
 Next, we do some very basic modifications that improve presentation of the table without any data manipulation.
 In best case scenarios, this may be all that is needed.
@@ -137,7 +137,7 @@ In best case scenarios, this may be all that is needed.
 # Rename and reduce columns.
 cols <- c(
     "Genes",
-    "Abundance Ratio: Scr/SH",
+    "Abundance Ratio: log2(scr/SH)",
     "scrRNA Abundance",
     "shBAG3 Abundance"
 )
@@ -192,14 +192,22 @@ eturkesRutils::datatable(dt_abun) %>%
     DT::formatStyle("Genes", `text-align` = "center")
 ```
 
-# Statistical Filtering
+# Addressing Issues
 
-Due to several limitations of this dataset, it is unreliable to gleam insights from the results thus far.
-Nonetheless, there exists statistical techniques that are suitable for further filtering the data.
+The data wrangling thus far reveals several issues that we will attempt to tackle:
+
+- Missing values in the "shBAG3 Abundance" column, which make true ratio calculations impossible.
+- Maximum thresholds in the abundance ratio calculations, imposed by Proteome Discoverer for ratios above 100.
+- log2 normalized abundance ratios, which complicate interpretation without added benefit due to the lack of negative ratios.
+- Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
 ## Missing Value Imputation
 
+## Removal of Maximum Threshold
 
+## Renormalization
+
+## Hypothesis Testing
 
 # Session Info
 
