@@ -42,7 +42,6 @@ library("magrittr")
 
 # TODO:
 # Remove "docxtools" package.
-# Remove "magrittr" package.
 ```
 
 <style type="text/css">
@@ -106,7 +105,22 @@ First, let's take a look at the raw data output from Proteome Discoverer. The ta
 ```{r raw_data, include = TRUE, echo = TRUE}
 dt <- data.table::data.table(readxl::read_excel("../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"))
 
-eturkesRutils::datatable(dt)
+# This should use eturkesRutils::datatable but the exponential conversion doesn't seem to work on this table, so we recreate it excluding that feature.
+DT::datatable(
+    dt,
+    extensions = "Buttons",
+    options = list(
+        dom = "Blfrtip",
+        buttons = list(
+            "copy", "print", list(
+                extend = "collection", buttons = c(
+                    "csv", "excel", "pdf"
+                ),
+                text = "Download"
+            )
+        )
+    )
+)
 ```
 
 # Basic Cleaning
@@ -140,18 +154,8 @@ dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
 watson_genes <- data.table::fread("../watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv")
 dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
-DT::datatable(dt, options = list(
-    rowCallback = DT::JS(
-        "function(row, data) {",
-        "for (i = 1; i < data.length; i++) {",
-        "if (data[i]>1000 | data[i]<1){",
-        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
-        "}",
-        "}",
-        "}"
-        )
-    )
-) %>% DT::formatRound(2)
+eturkesRutils::datatable(dt) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ## Sort Schemes {.tabset}
@@ -163,18 +167,8 @@ The above table does not appear to be straightforwardly sorted by any of the col
 ```{r specificity_with_bag3, include = TRUE, echo = TRUE}
 dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 
-DT::datatable(dt_spec, options = list(
-    rowCallback = DT::JS(
-        "function(row, data) {",
-        "for (i = 1; i < data.length; i++) {",
-        "if (data[i]>1000 | data[i]<1){",
-        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
-        "}",
-        "}",
-        "}"
-        )
-    )
-) %>% DT::formatRound(2)
+eturkesRutils::datatable(dt_spec) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### Abundance of Protein
@@ -182,18 +176,8 @@ DT::datatable(dt_spec, options = list(
 ```{r abundance_of_protein, include = TRUE, echo = TRUE}
 dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 
-DT::datatable(dt_abun, options = list(
-    rowCallback = DT::JS(
-        "function(row, data) {",
-        "for (i = 1; i < data.length; i++) {",
-        "if (data[i]>1000 | data[i]<1){",
-        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
-        "}",
-        "}",
-        "}"
-        )
-    )
-) %>% DT::formatRound(2)
+eturkesRutils::datatable(dt_abun) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 # Statistical Filtering
