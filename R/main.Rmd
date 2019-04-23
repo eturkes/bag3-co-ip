@@ -39,11 +39,13 @@ knit: (
 # limitations under the License.
 
 knitr::opts_chunk$set(echo = TRUE)
+options(stringsAsFactors = FALSE)
 
 library("magrittr")
 
 # TODO:
 # Remove "docxtools" package.
+# Remove "reshape2" package.
 ```
 
 <style type="text/css">
@@ -226,18 +228,25 @@ Due to the recency of its publication, we will benchmark the two techniques, alo
 cols_mvi <- cols[cols != cols[2]]
 dt_mvi <- dt[, cols_mvi, with = FALSE]
 dt_mvi[dt_mvi == 0] <- NA
-dt_mvi <- reshape2::melt(dt_mvi, id = cols[1], variable.name = "group")
-dt_mvi <- tidyr::spread(dt_mvi, cols[1], "value")
+dt_mvi <- data.table::melt.data.table(
+  dt_mvi, id = cols[1],
+  variable.name = "group",
+  variable.factor = TRUE
+)
+dt_mvi <- tidyr::spread(
+  dt_mvi,cols[1],
+  "value"
+)
+dt_mvi[["group"]] <- as.numeric(dt_mvi[["group"]])
 ```
 
 ### GSimp
 
 ```{r, include = TRUE, echo = TRUE}
-options(stringsAsFactors = FALSE)
 source("../GSimp/Trunc_KNN/Imput_funcs.r")
 source("../GSimp/GSimp_evaluation.R")
 source("../GSimp/GSimp.R")
-#pre_processing_GS_wrapper(dt_mvi)
+pre_processing_GS_wrapper(dt_mvi)
 ```
 
 ### QRILC
