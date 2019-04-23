@@ -39,6 +39,7 @@ knit: (
 # limitations under the License.
 
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "../")
 
 library("magrittr")
 
@@ -107,7 +108,7 @@ The table below is unedited except for minimal formatting outside of R for easie
 
 ```{r, include = TRUE, echo = FALSE}
 dt <- data.table::data.table(readxl::read_excel(
-  "../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
+  "proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
 
 # This should use eturkesRutils::datatable but the exponential conversion doesn't seem to work on this table.
@@ -140,7 +141,7 @@ In best case scenarios, this may be all that is needed.
 
 ```{r, include = TRUE, echo = TRUE}
 dt <- data.table::data.table(readxl::read_excel(
-  "../proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
+  "proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
 
 # Rename and reduce columns.
@@ -167,7 +168,7 @@ dt[is.na(dt)] <- 0
 dt[[cols[1]]] <- stringr::str_extract(dt[[cols[1]]], "(?<=GN=).*(?= PE=)")
 dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
 watson_genes <- data.table::fread(
-  "../watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv"
+  "watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv"
 )
 dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
@@ -232,11 +233,10 @@ dt_mvi <- tidyr::spread(dt_mvi, cols[1], "value")
 
 ### GSimp
 
-```{r, include = TRUE, echo = TRUE}
-#options(stringsAsFactors = FALSE)
-#source("../GSimp/Trunc_KNN/Imput_funcs.r")
-#source("../GSimp/GSimp_evaluation.R")
-#source("../Gsimp/GSimp.R")
+```{r, include = FALSE}
+options(stringsAsFactors = FALSE)
+source("GSimp/Trunc_KNN/Imput_funcs.r")
+source("GSimp/GSimp_evaluation.R")
 ```
 
 ### QRILC
