@@ -217,18 +217,17 @@ The appropriate method is dependent on the type of missing value.
 This set likely contains left-censored missing not at random (MNAR) values due to missing values only being present in the BAG3 KO condition.
 Since the KO was 90% efficient, non-zero abundances that fall below the limits of quantification (LOQ) are expected.  
 
-For treating this kind of data, Wei et al. benchmarked three methods:
+In their review, Wei et al. demonstrated QRILC (quantile regression imputation of left-censored data) to be the most performant method for this kind of data.
+However, they have since published an original method called GSimp [@wei_gsimp:_2018], an iterative Gibbs sampler based left-censored missing value imputation approach, which outperformed previous benchmarks on several datasets.
+Due to the recency of its publication, we will benchmark the two techniques, along with the far simplier but still useful HM (half-minimum) technique.
 
-- QRILC (Quantile Regression Imputation of Left-Censored data)
-- HM (Half-minimum)
-- Zero
+```{r, include = TRUE, echo = TRUE}
+# Melt the data to a suitable format.
 
-Due to the use of ratios in our analysis, zero value imputation is decidedly unsuitable.
-Concerning the details of the other two methods,
 
-> " QRILC imputes the left-censored data by randomly drawing values from a truncated normal distribution while HM replaces missing elements by using the half of the minimum of non-missing values" [@wei_missing_2018, pp. 4].
+```
 
-We decide to implement both methods and compare as both were found to perform well in @wei_missing_2018, with QRILC having higher overall performance whereas HM is easier to understand and interpret.
+### GSimp
 
 ### QRILC
 
