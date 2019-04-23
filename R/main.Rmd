@@ -243,9 +243,9 @@ dt_mvi[["group"]] <- as.numeric(dt_mvi[["group"]])
 ### GSimp
 
 ```{r, include = TRUE, echo = TRUE}
-source("../GSimp/Trunc_KNN/Imput_funcs.r")
-source("../GSimp/GSimp_evaluation.R")
-source("../GSimp/GSimp.R")
+source("../GSimp-eturkes/Trunc_KNN/Imput_funcs.r")
+source("../GSimp-eturkes/GSimp_evaluation.R")
+source("../GSimp-eturkes/GSimp.R")
 pre_processing_GS_wrapper(dt_mvi)
 ```
 
