@@ -222,9 +222,12 @@ However, they have since published an original method called GSimp [@wei_gsimp:_
 Due to the recency of its publication, we will benchmark the two techniques, along with the far simplier but still useful HM (half-minimum) technique.
 
 ```{r, include = TRUE, echo = TRUE}
-# Melt the data to a suitable format.
-
-
+# Data must be made "tidy".
+cols_mvi <- cols[cols != cols[2]]
+dt_mvi <- dt[, cols_mvi, with = FALSE]
+dt_mvi[dt_mvi == 0] <- NA
+dt_mvi <- reshape2::melt(dt_mvi, id = cols[1], variable.name = "group")
+dt_mvi <- tidyr::spread(dt_mvi, cols[1], "value")
 ```
 
 ### GSimp
