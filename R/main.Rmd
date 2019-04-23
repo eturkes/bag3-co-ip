@@ -213,6 +213,22 @@ The data wrangling thus far reveals several issues that we will attempt to tackl
 ## Missing Value Imputation
 
 There are a handful of methods for addressing missing values in metabolomics data, which were reviewed and compared in @wei_missing_2018.
+The appropriate method is dependent on the type of missing value.
+This set likely contains left-censored missing not at random (MNAR) values due to missing values only being present in the BAG3 KO condition.
+Since the KO was 90% efficient, non-zero abundances that fall below the limits of quantification (LOQ) are expected.  
+
+For treating this kind of data, Wei et al. benchmarked three methods:
+
+- QRILC (Quantile Regression Imputation of Left-Censored data)
+- HM (Half-minimum)
+- Zero
+
+Due to the use of ratios in our analysis, zero value imputation is decidedly unsuitable.
+Concerning the details of the other two methods,
+
+> " QRILC imputes the left-censored data by randomly drawing values from a truncated normal distribution while HM replaces missing elements by using the half of the minimum of non-missing values" [@wei_missing_2018, pp. 4].
+
+We decide to implement both methods and compare as both were found to perform well in @wei_missing_2018, with QRILC having higher overall performance whereas HM is easier to understand and interpret.
 
 ## Removal of Maximum Threshold
 
