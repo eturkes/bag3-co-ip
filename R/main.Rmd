@@ -210,7 +210,7 @@ The data wrangling thus far reveals several issues that we will attempt to tackl
 - log2 normalized abundance ratios, which complicate interpretation without added benefit due to the lack of negative ratios.
 - Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
-## Missing Value Imputation
+## Missing Value Imputation {.tabset}
 
 There are a handful of methods for addressing missing values in metabolomics data, which were reviewed and compared in @wei_missing_2018.
 The appropriate method is dependent on the type of missing value.
@@ -229,6 +229,10 @@ Concerning the details of the other two methods,
 > " QRILC imputes the left-censored data by randomly drawing values from a truncated normal distribution while HM replaces missing elements by using the half of the minimum of non-missing values" [@wei_missing_2018, pp. 4].
 
 We decide to implement both methods and compare as both were found to perform well in @wei_missing_2018, with QRILC having higher overall performance whereas HM is easier to understand and interpret.
+
+### QRILC
+
+### HM
 
 ## Removal of Maximum Threshold
 
