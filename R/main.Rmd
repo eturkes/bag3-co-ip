@@ -232,6 +232,13 @@ dt_mvi <- tidyr::spread(dt_mvi, cols[1], "value")
 
 ### GSimp
 
+```{r, include = TRUE, echo = TRUE}
+#options(stringsAsFactors = FALSE)
+#source("../GSimp/Trunc_KNN/Imput_funcs.r")
+#source("../GSimp/GSimp_evaluation.R")
+#source("../Gsimp/GSimp.R")
+```
+
 ### QRILC
 
 ### HM
