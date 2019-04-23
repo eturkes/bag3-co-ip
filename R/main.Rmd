@@ -45,7 +45,6 @@ library("magrittr")
 
 # TODO:
 # Remove "docxtools" package.
-# Remove "reshape2" package.
 ```
 
 <style type="text/css">
