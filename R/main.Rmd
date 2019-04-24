@@ -41,6 +41,7 @@ knit: (
 knitr::opts_chunk$set(echo = TRUE)
 options(stringsAsFactors = FALSE)
 
+library("doSNOW")
 library("magrittr")
 
 # TODO:
@@ -223,12 +224,17 @@ However, they have since published an original method called GSimp [@wei_gsimp:_
 Due to the recency of its publication, we will benchmark the two techniques, along with the far simplier but still useful HM (half-minimum) technique.
 
 ```{r, include = TRUE, echo = TRUE}
+source("../GSimp-eturkes/Trunc_KNN/Imput_funcs.r")
+source("../GSimp-eturkes/GSimp_evaluation.R")
+source("../GSimp-eturkes/GSimp.R")
+
 # Data must be made "tidy".
 cols_mvi <- cols[cols != cols[2]]
 dt_mvi <- dt[, cols_mvi, with = FALSE]
 dt_mvi[dt_mvi == 0] <- NA
 dt_mvi <- data.table::melt.data.table(
-  dt_mvi, id = cols[1],
+  dt_mvi,
+  id = cols[1],
   variable.name = "group",
   variable.factor = TRUE
 )
@@ -236,16 +242,24 @@ dt_mvi <- tidyr::spread(
   dt_mvi,cols[1],
   "value"
 )
-dt_mvi[["group"]] <- as.numeric(dt_mvi[["group"]])
+data.table::setDF(dt_mvi)
+dt_mvi[sapply(dt_mvi, is.numeric)] <- lapply(dt_mvi[sapply(dt_mvi, is.numeric)], as.integer)
+
+# GSimp is capable of group-wise filtering with an optional "group" column according to the authors.
+# However, there is no good example provided, so we move groups to row names.
+dt_mvi <- data.frame(dt_mvi[ , -1], row.names = dt_mvi[ , 1])
 ```
 
 ### GSimp
 
 ```{r, include = TRUE, echo = TRUE}
-source("../GSimp-eturkes/Trunc_KNN/Imput_funcs.r")
-source("../GSimp-eturkes/GSimp_evaluation.R")
-source("../GSimp-eturkes/GSimp.R")
-pre_processing_GS_wrapper(dt_mvi)
+# Record positions of missing values.
+NA_pos <- which(is.na(dt_mvi), arr.ind = TRUE)
+col_na <- NA_pos[, 2]
+
+# Imputations.
+set.seed(123)
+after_GS_imp <- pre_processing_GS_wrapper(dt_mvi)
 ```
 
 ### QRILC

@@ -160,6 +160,12 @@ Version: 1.0.14
 Hash: 7e564b9d723d8648b18457baba2a1383
 Requires: foreach, iterators
 
+Package: doSNOW
+Source: CRAN
+Version: 1.0.16
+Hash: fa059310e2902a619e06ad62ffc0a578
+Requires: foreach, iterators, snow
+
 Package: docxtools
 Source: CRAN
 Version: 0.2.1
@@ -573,6 +579,11 @@ Version: 1.3.1
 Hash: 8807813e4c9f07028336aeb805cfadae
 Requires: R6, crayon, digest, htmltools, httpuv, jsonlite, later, mime,
     promises, rlang, sourcetools, xtable
+
+Package: snow
+Source: CRAN
+Version: 0.4-3
+Hash: 350fc9078c96345a2246415fc9e67311
 
 Package: sourcetools
 Source: CRAN
