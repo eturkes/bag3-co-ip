@@ -1,11 +1,7 @@
 PackratFormat: 1.4
 PackratVersion: 0.5.0
 RVersion: 3.5.3
-Repos: BioCsoft=https://bioconductor.org/packages/3.8/bioc,
-    BioCann=https://bioconductor.org/packages/3.8/data/annotation,
-    BioCexp=https://bioconductor.org/packages/3.8/data/experiment,
-    BioCworkflows=https://bioconductor.org/packages/3.8/workflows,
-    CRAN=https://cran.rstudio.com
+Repos: CRAN=https://cran.rstudio.com/
 
 Package: BH
 Source: CRAN
@@ -22,6 +18,16 @@ Package: BiocGenerics
 Source: Bioconductor
 Version: 0.28.0
 Hash: adb2b2b75a0043b9a2098354e9acb5fe
+
+Package: BiocManager
+Source: CRAN
+Version: 1.30.4
+Hash: 355639afbcb951bf238be84a81bb5b20
+
+Package: BiocVersion
+Source: Bioconductor
+Version: 3.8.0
+Hash: 761d981e13b5100ec443b88b99ec5630
 
 Package: DT
 Source: CRAN
@@ -139,7 +145,7 @@ Package: devtools
 Source: CRAN
 Version: 2.0.2
 Hash: 9d0d6e31d44ffe876c3328fc444ae787
-Requires: digest, jsonlite, callr, cli, git2r, httr, memoise, pkgbuild,
+Requires: callr, cli, digest, git2r, httr, jsonlite, memoise, pkgbuild,
     pkgload, rcmdcheck, remotes, rstudioapi, sessioninfo, usethis,
     withr
 
@@ -159,6 +165,12 @@ Source: CRAN
 Version: 1.0.16
 Hash: fa059310e2902a619e06ad62ffc0a578
 Requires: foreach, iterators, snow
+
+Package: docxtools
+Source: CRAN
+Version: 0.2.1
+Hash: e5b0b23a108e65b56be94fde34ad46c0
+Requires: dplyr, ggplot2, lubridate, purrr, rlang, stringr, tidyr
 
 Package: dplyr
 Source: CRAN
@@ -215,7 +227,7 @@ Package: gh
 Source: CRAN
 Version: 1.0.1
 Hash: 3f8812accd1320227d744bca620e8c42
-Requires: jsonlite, httr, ini
+Requires: httr, ini, jsonlite
 
 Package: git2r
 Source: CRAN
@@ -277,7 +289,7 @@ Package: httr
 Source: CRAN
 Version: 1.4.0
 Hash: 62d62d3ffcc9a34411b6e35a813f72dd
-Requires: jsonlite, mime, R6, curl, openssl
+Requires: R6, curl, jsonlite, mime, openssl
 
 Package: impute
 Source: Bioconductor
@@ -285,19 +297,10 @@ Version: 1.56.0
 Hash: ebdb34f141ebf96a1294d68b1b04fff5
 
 Package: imputeLCMD
-Source: github
+Source: CRAN
 Version: 2.0
-Hash: a6344e5d906efe2d3a6a26635b40a9a3
+Hash: 8c3a2b508408e3aa2e0b0b332cc2978a
 Requires: impute, norm, pcaMethods, tmvtnorm
-GithubRepo: imputeLCMD-eturkes
-GithubUsername: eturkes
-GithubRef: master
-GithubSha1: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
-RemoteHost: api.github.com
-RemoteRepo: imputeLCMD-eturkes
-RemoteUsername: eturkes
-RemoteRef: master
-RemoteSha: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
 
 Package: ini
 Source: CRAN
@@ -341,6 +344,12 @@ Package: lazyeval
 Source: CRAN
 Version: 0.2.2
 Hash: 563563691bea3cde6945a98996d7c166
+
+Package: lubridate
+Source: CRAN
+Version: 1.7.4
+Hash: 3206e6df69af4462c2c17c0e207f79a3
+Requires: Rcpp, stringr
 
 Package: magrittr
 Source: CRAN
@@ -452,7 +461,7 @@ Package: prettyunits
 Source: CRAN
 Version: 1.0.2
 Hash: 49286102a855640daaa38eafe8b1ec30
-Requires: magrittr, assertthat
+Requires: assertthat, magrittr
 
 Package: processx
 Source: CRAN
@@ -492,7 +501,7 @@ Package: rcmdcheck
 Source: CRAN
 Version: 1.3.2
 Hash: 162a63e909423b7c5f44c30711135481
-Requires: digest, R6, callr, cli, crayon, desc, pkgbuild, prettyunits,
+Requires: R6, callr, cli, crayon, desc, digest, pkgbuild, prettyunits,
     rprojroot, sessioninfo, withr, xopen
 
 Package: readxl
@@ -566,8 +575,8 @@ Requires: cli, withr
 
 Package: shiny
 Source: CRAN
-Version: 1.3.2
-Hash: a48cf01573400333efa51dc999ab6447
+Version: 1.3.1
+Hash: 8807813e4c9f07028336aeb805cfadae
 Requires: R6, crayon, digest, htmltools, httpuv, jsonlite, later, mime,
     promises, rlang, sourcetools, xtable
 
@@ -594,8 +603,8 @@ Requires: glue, magrittr, stringi
 
 Package: sys
 Source: CRAN
-Version: 3.2
-Hash: aaa3f56d4255306a32ea30df8ef63901
+Version: 3.1
+Hash: dc2a997b1b9a2d3f9c234491153cb951
 
 Package: tibble
 Source: CRAN
@@ -632,8 +641,8 @@ Package: usethis
 Source: CRAN
 Version: 1.5.0
 Hash: 56dfac7b823f31dede3b13a256d4e6f1
-Requires: glue, yaml, clipr, clisymbols, crayon, curl, desc, fs, gh,
-    git2r, purrr, rlang, rprojroot, rstudioapi, whisker, withr
+Requires: clipr, clisymbols, crayon, curl, desc, fs, gh, git2r, glue,
+    purrr, rlang, rprojroot, rstudioapi, whisker, withr, yaml
 
 Package: utf8
 Source: CRAN
@@ -674,8 +683,8 @@ Requires: processx
 
 Package: xtable
 Source: CRAN
-Version: 1.8-4
-Hash: dc0d47261b678d26032363bebd050540
+Version: 1.8-3
+Hash: 91199102994584c5f0e8cbba5582ecc4
 
 Package: yaml
 Source: CRAN

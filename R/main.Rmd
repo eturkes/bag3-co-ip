@@ -43,6 +43,9 @@ options(stringsAsFactors = FALSE)
 
 library("doSNOW")
 library("magrittr")
+
+# TODO:
+# Remove "docxtools" package.
 ```
 
 <style type="text/css">
