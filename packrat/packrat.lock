@@ -166,12 +166,6 @@ Version: 1.0.16
 Hash: fa059310e2902a619e06ad62ffc0a578
 Requires: foreach, iterators, snow
 
-Package: docxtools
-Source: CRAN
-Version: 0.2.1
-Hash: e5b0b23a108e65b56be94fde34ad46c0
-Requires: dplyr, ggplot2, lubridate, purrr, rlang, stringr, tidyr
-
 Package: dplyr
 Source: CRAN
 Version: 0.8.0.1
@@ -297,10 +291,19 @@ Version: 1.56.0
 Hash: ebdb34f141ebf96a1294d68b1b04fff5
 
 Package: imputeLCMD
-Source: CRAN
+Source: github
 Version: 2.0
-Hash: 8c3a2b508408e3aa2e0b0b332cc2978a
+Hash: a6344e5d906efe2d3a6a26635b40a9a3
 Requires: impute, norm, pcaMethods, tmvtnorm
+GithubRepo: imputeLCMD-eturkes
+GithubUsername: eturkes
+GithubRef: master
+GithubSha1: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
+RemoteHost: api.github.com
+RemoteRepo: imputeLCMD-eturkes
+RemoteUsername: eturkes
+RemoteRef: master
+RemoteSha: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
 
 Package: ini
 Source: CRAN
@@ -344,12 +347,6 @@ Package: lazyeval
 Source: CRAN
 Version: 0.2.2
 Hash: 563563691bea3cde6945a98996d7c166
-
-Package: lubridate
-Source: CRAN
-Version: 1.7.4
-Hash: 3206e6df69af4462c2c17c0e207f79a3
-Requires: Rcpp, stringr
 
 Package: magrittr
 Source: CRAN
@@ -575,8 +572,8 @@ Requires: cli, withr
 
 Package: shiny
 Source: CRAN
-Version: 1.3.1
-Hash: 8807813e4c9f07028336aeb805cfadae
+Version: 1.3.2
+Hash: a48cf01573400333efa51dc999ab6447
 Requires: R6, crayon, digest, htmltools, httpuv, jsonlite, later, mime,
     promises, rlang, sourcetools, xtable
 
@@ -603,8 +600,8 @@ Requires: glue, magrittr, stringi
 
 Package: sys
 Source: CRAN
-Version: 3.1
-Hash: dc2a997b1b9a2d3f9c234491153cb951
+Version: 3.2
+Hash: aaa3f56d4255306a32ea30df8ef63901
 
 Package: tibble
 Source: CRAN
@@ -683,8 +680,8 @@ Requires: processx
 
 Package: xtable
 Source: CRAN
-Version: 1.8-3
-Hash: 91199102994584c5f0e8cbba5582ecc4
+Version: 1.8-4
+Hash: dc0d47261b678d26032363bebd050540
 
 Package: yaml
 Source: CRAN
