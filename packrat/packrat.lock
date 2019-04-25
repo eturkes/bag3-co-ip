@@ -523,6 +523,12 @@ Version: 1.4.3
 Hash: 1331df4206d0207838eff5d4324f5919
 Requires: Rcpp, plyr, stringr
 
+Package: revealjs
+Source: CRAN
+Version: 0.9
+Hash: d33e5b244ff56eaec0dec87babea8730
+Requires: rmarkdown
+
 Package: rlang
 Source: CRAN
 Version: 0.3.4
