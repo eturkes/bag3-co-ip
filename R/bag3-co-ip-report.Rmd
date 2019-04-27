@@ -218,7 +218,7 @@ Since the KO was 90% efficient, non-zero abundances that fall below the limits o
 
 In their review, Wei et al. demonstrated QRILC (quantile regression imputation of left-censored data) to be the most performant method for this kind of data.
 However, they have since published an original method called GSimp [@wei_gsimp:_2018], an iterative Gibbs sampler based left-censored missing value imputation approach, which outperformed previous benchmarks on several datasets.
-Due to the recency of its publication, we will benchmark the two techniques, along with the far simplier but still useful HM (half-minimum) technique.
+Due to the recency of its publication, we will benchmark the two techniques, along with the far simpler but still useful HM (half-minimum) technique.
 
 ```{r, include = TRUE, echo = TRUE}
 # Data must be made "tidy".
@@ -232,10 +232,14 @@ dt_mvi <- data.table::melt.data.table(
   variable.factor = TRUE
 )
 dt_mvi <- tidyr::spread(
-  dt_mvi,cols[1],
+  dt_mvi,
+  cols[1],
   "value"
 )
 data.table::setDF(dt_mvi)
+
+# Using numeric instead of integer in the MVI functions produce errors, so we convert for now.
+# Not a great solution because we lose information (though it's basically insignificant at the values we're dealing with).
 dt_mvi[sapply(dt_mvi, is.numeric)] <- lapply(dt_mvi[sapply(dt_mvi, is.numeric)], as.integer)
 
 # GSimp is capable of group-wise filtering with an optional "group" column according to the authors.
@@ -255,6 +259,22 @@ Therefore, we simply show a summary of the debugging session below.
 ![](../data/debug/left-mydata-right-untargeted.png)
 
 ### QRILC
+
+```{r, include = TRUE, echo = TRUE}
+dt_qrilc_tmp <- imputeLCMD::impute.QRILC(dt_mvi) %>% extract2(1)
+
+# "Untidy" data.
+dt_qrilc_tmp <- tibble::rownames_to_column(dt_qrilc_tmp)
+dt_qrilc <- data.frame(t(dt_qrilc_tmp[-1]))
+colnames(dt_qrilc) <- dt_qrilc_tmp[ , 1]
+dt_qrilc <- tibble::rownames_to_column(dt_qrilc, var = "Genes")
+data.table::setDT(dt_qrilc)
+
+# Combine with original data table.
+
+
+eturkesRutils::datatable(dt_qrilc)
+```
 
 ### HM
 
