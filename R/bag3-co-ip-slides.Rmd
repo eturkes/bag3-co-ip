@@ -7,8 +7,7 @@ link-citations: true
 output:
   revealjs::revealjs_presentation:
     transition: slide
-    self_contained: false
-    reveal_plugins: ["zoom"]
+    self_contained: true
 knit: (
     function(inputFile, encoding) {
         rmarkdown::render(
