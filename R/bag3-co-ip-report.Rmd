@@ -220,6 +220,9 @@ In their review, Wei et al. demonstrated QRILC (quantile regression imputation o
 However, they have since published an original method called GSimp [@wei_gsimp:_2018], an iterative Gibbs sampler based left-censored missing value imputation approach, which outperformed previous benchmarks on several datasets.
 Due to the recency of its publication, we will benchmark the two techniques, along with the far simpler but still useful HM (half-minimum) technique.
 
+Note that in the previous data tables, the maximal value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
+This maxima is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
+
 ```{r, include = TRUE, echo = TRUE}
 # Data must be made "tidy".
 cols_mvi <- cols[cols != cols[2]]
@@ -271,9 +274,21 @@ dt_qrilc <- tibble::rownames_to_column(dt_qrilc, var = "Genes")
 data.table::setDT(dt_qrilc)
 
 # Combine with original data table.
+dt_tmp <- dt[order(dt[[cols[1]]])]
+dt_tmp[[cols[4]]] <- dt_qrilc[[cols[4]]]
+dt_qrilc <- dt_tmp
 
+# Recalculate abundance ratio.
+for (row in 1:nrow(dt_qrilc)) {
+    dt_qrilc[[cols[2]]] <- log2(dt_qrilc[[cols[3]]] / dt_qrilc[[cols[4]]])
+}
 
-eturkesRutils::datatable(dt_qrilc)
+# Use sort from "Specificity with BAG3".
+# It best displays the effects of imputation.
+dt_qrilc <- dt_qrilc[order(-dt_qrilc[[cols[2]]], dt_qrilc[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_qrilc) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### HM
