@@ -245,6 +245,9 @@ dt_mvi[sapply(dt_mvi, is.numeric)] <- lapply(dt_mvi[sapply(dt_mvi, is.numeric)],
 # GSimp is capable of group-wise filtering with an optional "group" column according to the authors.
 # However, there is no good example provided, so we move groups to row names.
 dt_mvi <- data.frame(dt_mvi[ , -1], row.names = dt_mvi[ , 1])
+
+# Prepare original table for merge.
+dt_tmp <- dt[order(dt[[cols[1]]])]
 ```
 
 ### GSimp
@@ -269,9 +272,6 @@ dt_qrilc <- data.frame(t(dt_qrilc_tmp[-1]))
 colnames(dt_qrilc) <- dt_qrilc_tmp[ , 1]
 dt_qrilc <- tibble::rownames_to_column(dt_qrilc, var = "Genes")
 data.table::setDT(dt_qrilc)
-
-# Combine with original data table.
-dt_tmp <- dt[order(dt[[cols[1]]])]
 dt_tmp[[cols[4]]] <- dt_qrilc[[cols[4]]]
 dt_qrilc <- dt_tmp
 
@@ -287,6 +287,34 @@ eturkesRutils::datatable(dt_qrilc) %>% DT::formatStyle("Genes", `text-align` = "
 ```
 
 ### HM
+
+```{r, include = TRUE, echo = TRUE}
+dt_hm_tmp <- dt_mvi
+dt_hm_tmp[] <- lapply(dt_mvi, function(x) {
+    x[is.na(x)] <- min(x, na.rm = TRUE) / 2
+    x
+    }
+)
+
+# "Untidy" data.
+dt_hm_tmp <- tibble::rownames_to_column(dt_hm_tmp)
+dt_hm <- data.frame(t(dt_hm_tmp[-1]))
+colnames(dt_hm) <- dt_hm_tmp[ , 1]
+dt_hm <- tibble::rownames_to_column(dt_hm, var = "Genes")
+data.table::setDT(dt_hm)
+dt_tmp[[cols[4]]] <- dt_hm[[cols[4]]]
+dt_hm <- dt_tmp
+
+# Recalculate abundance ratio.
+for (row in 1:nrow(dt_hm)) {
+    dt_hm[[cols[2]]] <- log2(dt_hm[[cols[3]]] / dt_hm[[cols[4]]])
+}
+
+# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+dt_hm <- dt_hm[order(-dt_hm[[cols[2]]], dt_hm[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_hm) %>% DT::formatStyle("Genes", `text-align` = "center")
+```
 
 ## Removal of Maximum Threshold
 
