@@ -154,8 +154,7 @@ dt <- plyr::rename(dt, c(
     "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
     "Scr Abundances" = cols[3],
     "SH Abundances" = cols[4]
-    )
-)
+))
 dt <- dt[, cols, with = FALSE]
 dt[is.na(dt)] <- 0
 
@@ -292,9 +291,7 @@ eturkesRutils::datatable(dt_qrilc) %>% DT::formatStyle("Genes", `text-align` = "
 dt_hm_tmp <- dt_mvi
 dt_hm_tmp[] <- lapply(dt_mvi, function(x) {
     x[is.na(x)] <- min(x, na.rm = TRUE) / 2
-    x
-    }
-)
+})
 
 # "Untidy" data.
 dt_hm_tmp <- tibble::rownames_to_column(dt_hm_tmp)
