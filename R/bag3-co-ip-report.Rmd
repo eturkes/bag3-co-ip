@@ -212,12 +212,21 @@ The appropriate method is dependent on the type of missing value.
 This set likely contains left-censored missing not at random (MNAR) values due to missing values only being present in the BAG3 KO condition.
 Since the KO was 90% efficient, non-zero abundances that fall below the limits of quantification (LOQ) are expected.  
 
-In their review, Wei et al. demonstrated QRILC (quantile regression imputation of left-censored data) to be the most performant method for this kind of data.
+In their review, Wei et al. demonstrated QRILC to be the most performant method for this kind of data, following by HM.
 However, they have since published an original method called GSimp [@wei_gsimp:_2018], an iterative Gibbs sampler based left-censored missing value imputation approach, which outperformed previous benchmarks on several datasets.
-Due to the recency of its publication, we will benchmark the two techniques, along with the far simpler but still useful HM (half-minimum) technique.
+Due to the recency of its publication, we benchmark the following:
+
+- GSimp: An iterative Gibbs sampler based left-censored missing value imputation approach.
+- QRILC: Quantile regression imputation of left-censored data.
+- HM: The half-minimum of non-missing values for each variable.
+
+Additionally, we try two custom techniques:
+
+- 10% Min: A variation of the HM technique which uses 10% of the minimum due to the reported 90% knockdown efficiency of the shBAG3 condition.
+- Within Condition Min: Takes the per condition minimum and applies it to all missing values within that condition.
 
 Note that in the previous data tables, the maximal value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
-This maxima is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
+This maximum is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
 
 ```{r, include = TRUE, echo = TRUE}
 # Data must be made "tidy".
@@ -291,6 +300,7 @@ eturkesRutils::datatable(dt_qrilc) %>% DT::formatStyle("Genes", `text-align` = "
 dt_hm_tmp <- dt_mvi
 dt_hm_tmp[] <- lapply(dt_mvi, function(x) {
     x[is.na(x)] <- min(x, na.rm = TRUE) / 2
+    x
 })
 
 # "Untidy" data.
@@ -311,6 +321,64 @@ for (row in 1:nrow(dt_hm)) {
 dt_hm <- dt_hm[order(-dt_hm[[cols[2]]], dt_hm[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_hm) %>% DT::formatStyle("Genes", `text-align` = "center")
+```
+
+### 10% Min
+
+```{r, include = TRUE, echo = TRUE}
+dt_10min_tmp <- dt_mvi
+dt_10min_tmp[] <- lapply(dt_mvi, function(x) {
+    x[is.na(x)] <- min(x, na.rm = TRUE) * 0.10
+    x
+})
+
+# "Untidy" data.
+dt_10min_tmp <- tibble::rownames_to_column(dt_10min_tmp)
+dt_10min <- data.frame(t(dt_10min_tmp[-1]))
+colnames(dt_10min) <- dt_10min_tmp[ , 1]
+dt_10min <- tibble::rownames_to_column(dt_10min, var = "Genes")
+data.table::setDT(dt_10min)
+dt_tmp[[cols[4]]] <- dt_10min[[cols[4]]]
+dt_10min <- dt_tmp
+
+# Recalculate abundance ratio.
+for (row in 1:nrow(dt_10min)) {
+    dt_10min[[cols[2]]] <- log2(dt_10min[[cols[3]]] / dt_10min[[cols[4]]])
+}
+
+# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+dt_10min <- dt_10min[order(-dt_10min[[cols[2]]], dt_10min[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_10min) %>% DT::formatStyle("Genes", `text-align` = "center")
+```
+
+### Within Condition Min
+
+```{r, include = TRUE, echo = TRUE}
+dt_cond_min_tmp <- dt_mvi
+dt_cond_min_tmp[] <- lapply(dt_mvi, function(x) {
+    x[is.na(x)] <- min(dt_mvi[2, ], na.rm = TRUE)
+    x
+})
+
+# "Untidy" data.
+dt_cond_min_tmp <- tibble::rownames_to_column(dt_cond_min_tmp)
+dt_cond_min <- data.frame(t(dt_cond_min_tmp[-1]))
+colnames(dt_cond_min) <- dt_cond_min_tmp[ , 1]
+dt_cond_min <- tibble::rownames_to_column(dt_cond_min, var = "Genes")
+data.table::setDT(dt_cond_min)
+dt_tmp[[cols[4]]] <- dt_cond_min[[cols[4]]]
+dt_cond_min <- dt_tmp
+
+# Recalculate abundance ratio.
+for (row in 1:nrow(dt_cond_min)) {
+    dt_cond_min[[cols[2]]] <- log2(dt_cond_min[[cols[3]]] / dt_cond_min[[cols[4]]])
+}
+
+# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+dt_cond_min <- dt_cond_min[order(-dt_cond_min[[cols[2]]], dt_cond_min[[cols[4]]]), ]
+
+eturkesRutils::datatable(dt_cond_min) %>% DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ## Removal of Maximum Threshold
