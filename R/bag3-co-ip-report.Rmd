@@ -166,7 +166,7 @@ dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
 eturkesRutils::datatable(dt) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ## Sort Schemes {.tabset}
@@ -183,7 +183,7 @@ dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_spec) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
@@ -194,7 +194,7 @@ dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_abun) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # Addressing Issues
@@ -292,7 +292,7 @@ dt_qrilc <- dt_qrilc[order(-dt_qrilc[[cols[2]]], dt_qrilc[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_qrilc) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### HM
@@ -321,7 +321,7 @@ dt_hm <- dt_hm[order(-dt_hm[[cols[2]]], dt_hm[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_hm) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### 10% Min
@@ -350,7 +350,7 @@ dt_10min <- dt_10min[order(-dt_10min[[cols[2]]], dt_10min[[cols[4]]]), ]
 
 eturkesRutils::datatable(dt_10min) %>%
   DT::formatRound(2) %>%
-  DT::formatStyle("Genes", `text-align` = "center")
+  DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Within Condition Min
@@ -379,7 +379,7 @@ dt_cond_min <- dt_cond_min[order(-dt_cond_min[[cols[2]]], dt_cond_min[[cols[4]]]
 
 eturkesRutils::datatable(dt_cond_min) %>%
     DT::formatRound(2) %>%
-    DT::formatStyle("Genes", `text-align` = "center")
+    DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Benchmarks {.active}
