@@ -9,6 +9,7 @@ output:
         number_sections: true
         theme: lumen
         toc: true
+        toc_depth: 2
         toc_float:
             collapsed: false
             smooth_scroll: false
@@ -41,7 +42,6 @@ knit: (
 knitr::opts_chunk$set(echo = TRUE)
 options(stringsAsFactors = FALSE)
 
-library("doSNOW")
 library("magrittr")
 ```
 
@@ -72,11 +72,6 @@ div.tocify {
 .tocify-subheader .tocify-item {
   font-size: 0.95em;
   padding-left: 25px;
-  text-indent: 0;
-}
-.tocify-subheader .tocify-subheader .tocify-item {
-  font-size: 0.90em;
-  padding-left: 35px;
   text-indent: 0;
 }
 div.main-container {
@@ -137,7 +132,7 @@ The following sections breakdown the methods used to transform the contents in "
 First, we do some very basic modifications that improve presentation of the table without any data manipulation.
 In best case scenarios, this may be all that is needed.
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 dt <- data.table::data.table(readxl::read_excel(
   "../data/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
@@ -169,7 +164,9 @@ watson_genes <- data.table::fread(
 )
 dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
-eturkesRutils::datatable(dt) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ## Sort Schemes {.tabset}
@@ -180,20 +177,24 @@ The schemes can be cycled through the tabs below.
 
 ### Specificity with BAG3
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 # Secondary sorted by "shBAG3 Abundance" ascending.
 dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_spec) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_spec) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 # Secondary sorted by "shBAG3 Abundance" descending.
 dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_abun) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_abun) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 # Addressing Issues
@@ -228,7 +229,7 @@ Additionally, we try two custom techniques:
 Note that in the previous data tables, the maximal value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
 This maximum is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 # Data must be made "tidy".
 cols_mvi <- cols[cols != cols[2]]
 dt_mvi <- dt[, cols_mvi, with = FALSE]
@@ -271,7 +272,7 @@ Therefore, we simply show a summary of the debugging session below.
 
 ### QRILC
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 dt_qrilc_tmp <- imputeLCMD::impute.QRILC(dt_mvi) %>% extract2(1)
 
 # "Untidy" data.
@@ -284,19 +285,19 @@ dt_tmp[[cols[4]]] <- dt_qrilc[[cols[4]]]
 dt_qrilc <- dt_tmp
 
 # Recalculate abundance ratio.
-for (row in 1:nrow(dt_qrilc)) {
-    dt_qrilc[[cols[2]]] <- log2(dt_qrilc[[cols[3]]] / dt_qrilc[[cols[4]]])
-}
+dt_qrilc[[cols[2]]] <- log2(dt_qrilc[[cols[3]]] / dt_qrilc[[cols[4]]])
 
 # Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
 dt_qrilc <- dt_qrilc[order(-dt_qrilc[[cols[2]]], dt_qrilc[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_qrilc) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_qrilc) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### HM
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 dt_hm_tmp <- dt_mvi
 dt_hm_tmp[] <- lapply(dt_mvi, function(x) {
     x[is.na(x)] <- min(x, na.rm = TRUE) / 2
@@ -313,19 +314,19 @@ dt_tmp[[cols[4]]] <- dt_hm[[cols[4]]]
 dt_hm <- dt_tmp
 
 # Recalculate abundance ratio.
-for (row in 1:nrow(dt_hm)) {
-    dt_hm[[cols[2]]] <- log2(dt_hm[[cols[3]]] / dt_hm[[cols[4]]])
-}
+dt_hm[[cols[2]]] <- log2(dt_hm[[cols[3]]] / dt_hm[[cols[4]]])
 
 # Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
 dt_hm <- dt_hm[order(-dt_hm[[cols[2]]], dt_hm[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_hm) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_hm) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### 10% Min
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 dt_10min_tmp <- dt_mvi
 dt_10min_tmp[] <- lapply(dt_mvi, function(x) {
     x[is.na(x)] <- min(x, na.rm = TRUE) * 0.10
@@ -342,19 +343,19 @@ dt_tmp[[cols[4]]] <- dt_10min[[cols[4]]]
 dt_10min <- dt_tmp
 
 # Recalculate abundance ratio.
-for (row in 1:nrow(dt_10min)) {
-    dt_10min[[cols[2]]] <- log2(dt_10min[[cols[3]]] / dt_10min[[cols[4]]])
-}
+dt_10min[[cols[2]]] <- log2(dt_10min[[cols[3]]] / dt_10min[[cols[4]]])
 
 # Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
 dt_10min <- dt_10min[order(-dt_10min[[cols[2]]], dt_10min[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_10min) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_10min) %>%
+  DT::formatRound(2) %>%
+  DT::formatStyle("Genes", `text-align` = "center")
 ```
 
 ### Within Condition Min
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 dt_cond_min_tmp <- dt_mvi
 dt_cond_min_tmp[] <- lapply(dt_mvi, function(x) {
     x[is.na(x)] <- min(dt_mvi[2, ], na.rm = TRUE)
@@ -371,14 +372,60 @@ dt_tmp[[cols[4]]] <- dt_cond_min[[cols[4]]]
 dt_cond_min <- dt_tmp
 
 # Recalculate abundance ratio.
-for (row in 1:nrow(dt_cond_min)) {
-    dt_cond_min[[cols[2]]] <- log2(dt_cond_min[[cols[3]]] / dt_cond_min[[cols[4]]])
-}
+dt_cond_min[[cols[2]]] <- log2(dt_cond_min[[cols[3]]] / dt_cond_min[[cols[4]]])
 
 # Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
 dt_cond_min <- dt_cond_min[order(-dt_cond_min[[cols[2]]], dt_cond_min[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_cond_min) %>% DT::formatStyle("Genes", `text-align` = "center")
+eturkesRutils::datatable(dt_cond_min) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle("Genes", `text-align` = "center")
+```
+
+### Benchmarks {.active}
+
+In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the "Specificity with BAG3" sort scheme.
+Note GSimp is missing because it failed to run (see its tab for debug details).
+
+```{r}
+# Initialize data table.
+mvi_genes <- c()
+for (row in 1:nrow(dt_spec)) {
+    if (dt_spec[[row, cols[4]]] == 0) {
+        mvi_genes <- c(mvi_genes, dt_spec[[row, cols[1]]])
+    }
+}
+mvi_dts <- list(
+    dt_spec,
+    dt_qrilc,
+    dt_hm,
+    dt_10min,
+    dt_cond_min
+)
+dt_mvi_benchmark <- data.table::data.table(
+    "Missing Value Genes" = mvi_genes,
+    "Original Rank" = 0,
+    "QRILC Rank" = 0,
+    "HM Rank" = 0,
+    "10% Min Rank" = 0,
+    "Within Condition Min Rank" = 0
+)
+
+# Add values from data table list.
+col_count <- 1
+for (set in mvi_dts) {
+    col_count <- col_count + 1
+    for (benchmark_row in 1:nrow(dt_mvi_benchmark)) {
+        for (dts_row in 1:nrow(set)) {
+            if (set[[dts_row, 1]] == dt_mvi_benchmark[[benchmark_row, 1]]) {
+                dt_mvi_benchmark[benchmark_row, col_count] <- dts_row
+            }
+        }
+    }
+}
+
+eturkesRutils::datatable(dt_mvi_benchmark) %>%
+    DT::formatStyle("Missing Value Genes", `text-align` = "center")
 ```
 
 ## Removal of Maximum Threshold
@@ -389,7 +436,7 @@ eturkesRutils::datatable(dt_cond_min) %>% DT::formatStyle("Genes", `text-align` 
 
 # Session Info
 
-```{r, include = TRUE, echo = TRUE}
+```{r}
 devtools::session_info()
 ```
 

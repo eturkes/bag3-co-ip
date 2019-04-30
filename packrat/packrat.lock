@@ -175,18 +175,18 @@ Requires: BH, R6, Rcpp, assertthat, glue, magrittr, pkgconfig, plogr,
 
 Package: eturkesRutils
 Source: github
-Version: 0.2.0
-Hash: 881e6e6e3e861960b92ba24507faa8ca
+Version: 0.3.0
+Hash: 55c472002f6346e9af586b496796d188
 Requires: DT, magrittr
 GithubRepo: eturkesRutils
 GithubUsername: eturkes
 GithubRef: master
-GithubSha1: 5bc02e73194cb698641ed9fd03cac9cff78493a3
+GithubSha1: 0460ae481ae41e03860943baba28c682b3fbf357
 RemoteHost: api.github.com
 RemoteRepo: eturkesRutils
 RemoteUsername: eturkes
 RemoteRef: master
-RemoteSha: 5bc02e73194cb698641ed9fd03cac9cff78493a3
+RemoteSha: 0460ae481ae41e03860943baba28c682b3fbf357
 
 Package: evaluate
 Source: CRAN
