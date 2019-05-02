@@ -461,6 +461,19 @@ Therefore, we use the data table after 10% Min imputation for the following sect
 
 ## Renormalization
 
+For easier analysis and interpretation, we have decided to renormalize the values in the `Abundance Ratio: log2(scr/sh)` column.
+Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
+Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
+
+```{r}
+scale_factor <- 100 / max(dt_10min[[cols[2]]])
+dt_10min[[cols[2]]] <- dt_10min[[cols[2]]] * scale_factor
+
+eturkesRutils::datatable(dt_10min) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle(cols[1], `text-align` = "center")
+```
+
 ## Hypothesis Testing
 
 # Session Info
