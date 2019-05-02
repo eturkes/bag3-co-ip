@@ -95,7 +95,25 @@ The source code and instructions for rerunning the analysis can be found at [git
 
 # Final Results {-}
 
-Read just this section for the final results of the analysis and a summary of the methods.
+**Read just this section for the final results of the analysis and a summary of the methods.**
+
+The following is the final Co-IP MS dataset after cleaning as described in this report's method section.
+Briefly, the original dataset was subject to missing value imputation via a custom method, renormalized, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
+
+```{r, include = TRUE, echo = FALSE}
+cols <- c(
+    "Genes",
+    "Abundance Ratio: log2(scr/sh)",
+    "scrRNA Abundance",
+    "shBAG3 Abundance"
+)
+
+dt_final <- readRDS("../results/dt_final.rds")
+
+eturkesRutils::datatable(dt_final) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle(cols[1], `text-align` = "center")
+```
 
 # Original Data {-}
 
@@ -515,9 +533,14 @@ eturkesRutils::datatable(dt_10min) %>%
     DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
-# Session Info
+# Conclusion
+
+This concludes the methods used in this analysis.
+Below we simply write the data to disk for exploration in `Final Results` at the top of this report.
 
 ```{r}
+saveRDS(dt_10min, file = "../results/dt_final.rds")
+
 devtools::session_info()
 ```
 
