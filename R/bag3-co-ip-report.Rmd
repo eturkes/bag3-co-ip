@@ -450,15 +450,14 @@ plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = v
     ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
 )
 
-# plotly::ggplotly(ggplot2::ggplot(dt_10min, ggplot2::aes(`Abundance Ratio: log2(scr/sh)`)) +
-#     ggplot2::geom_histogram(bins = 100, fill = "gray", color = "black")
-# )
-
 plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = variable)) +
     ggplot2::geom_histogram(alpha = 0.25, bins = 10) +
     ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
 )
 ```
+
+As the figures show, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
+Therefore, we use the data table after 10% Min imputation for the following sections.
 
 ## Renormalization
 
