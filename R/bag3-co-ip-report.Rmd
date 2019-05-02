@@ -128,7 +128,7 @@ DT::datatable(
 
 # Breakdown of Methods {-}
 
-The following sections breakdown the methods used to transform the contents in "Original Data" to those in "Final Results".
+The following sections breakdown the methods used to transform the contents in `Original Data` to those in `Final Results`.
 
 # Preliminary Cleaning
 
@@ -204,8 +204,8 @@ eturkesRutils::datatable(dt_abun) %>%
 
 The data wrangling thus far reveals several issues that we will attempt to tackle:
 
-- Missing values in the "shBAG3 Abundance" column, which make true ratio calculations impossible.
-- log2 normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
+- Missing values in the `shBAG3 Abundance` column, which make true ratio calculations impossible.
+- $log2$ normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
 - Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
 ## Missing Value Imputation {.tabset}
@@ -228,7 +228,7 @@ Additionally, we try two custom techniques:
 - 10% Min: A variation of the HM technique which uses 10% of the minimum due to the reported 90% knockdown efficiency of the shBAG3 condition.
 - Within Condition Min: Takes the per condition minimum and applies it to all missing values within that condition.
 
-Note that in the previous data tables, the maximum value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
+Note that in the previous data tables, the maximum value of the abundance ratio was $6.64$, representing the $log2$ of $100 fold change$.
 This maximum is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
 
 ```{r}
@@ -386,9 +386,9 @@ eturkesRutils::datatable(dt_cond_min) %>%
 
 ### Benchmarks {.active}
 
-In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the "Specificity with BAG3" sort scheme.
+In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the `Specificity with BAG3` sort scheme.
 Note GSimp is missing because it failed to run (see its tab for debug details).
-The ranking ranges from 1-95.
+The ranking ranges from $1-95$.
 
 ```{r}
 # Initialize data table.
