@@ -290,6 +290,12 @@ Version: 1.4.0
 Hash: 62d62d3ffcc9a34411b6e35a813f72dd
 Requires: R6, curl, jsonlite, mime, openssl
 
+Package: ibb
+Source: source
+Version: 13.06
+Hash: d9fe9d21151198cc120ad5cd2e627ce1
+SourcePath: ~/Documents/apps/R/ibb
+
 Package: impute
 Source: Bioconductor
 Version: 1.56.0

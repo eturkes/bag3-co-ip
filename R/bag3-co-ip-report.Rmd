@@ -88,7 +88,7 @@ The background for this data is as follows:
 - Co-IP MS (co-immunoprecipitation mass spectrometry) using BAG3 as bait.
 - scrRNA control and shBAG3 to knockdown BAG3 for assessing BAG3 specific interactions.
 - Approximately 90% efficient knockdown.
-- Single replicate of mature rat primary cortical neurons (DIV 24).
+- Single sample ($n = 1$) of mature rat primary cortical neurons (DIV 24).
 
 This analysis was performed in R except where noted.
 The source code and instructions for rerunning the analysis can be found at [github.com/eturkes/bag3-co-ip](https://github.com/eturkes/bag3-co-ip).
@@ -475,6 +475,45 @@ eturkesRutils::datatable(dt_10min) %>%
 ```
 
 ## Hypothesis Testing
+
+Due to the $n = 1$ sample size, the most standard hypothesis tests for mass spec proteomics like ANOVA are unavailable.
+However, in @bantscheff_quantitative_2007, the following tests for experiments without replicates were reviewed and found to be suitable when a large number of peptide spectra are present:
+
+- G-test
+- Fischer's exact test
+- AC-test
+
+In 2010, the beta-binomial model was adapted for analysis of mass spec proteomics in @pham_beta-binomial_2010.
+This method effectively takes into account both within- and between-sample variation and was found to outperform the aforementioned methods in a variety of cases.
+The beta-binomial approach has since become a standard according to a 2018 review introducing the statistical foundations of quantitative proteomics [@burger_gentle_2018].
+Below, we apply the beta-binomial model to our dataset using the R package developed in @pham_beta-binomial_2010.
+The table is sorted from highest p values to low, to show what might be filtered out when we apply a cutoff.
+
+```{r}
+ibb_out <- ibb::ibb.test(
+    dt_10min[ , 3:4],
+    colSums(dt_10min[ , 3:4]),
+    c(rep("pre", 1), rep("post", 1)),
+    n.threads = -1
+)
+dt_10min <- cbind(dt_10min, ibb_out[["p.value"]])
+colnames(dt_10min)[5] <- "p-value"
+dt_10min <- dt_10min[order(-dt_10min[["p-value"]])]
+
+eturkesRutils::datatable(dt_10min) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle(cols[1], `text-align` = "center")
+```
+Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries in the above list, and sort from low to high p-values.
+
+```{r}
+dt_10min <- dt_10min[dt_10min[["p-value"]] < 0.05, ]
+dt_10min <- dt_10min[order(dt_10min[["p-value"]])]
+
+eturkesRutils::datatable(dt_10min) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle(cols[1], `text-align` = "center")
+```
 
 # Session Info
 
