@@ -90,6 +90,9 @@ The background for this data is as follows:
 - Approximately 90% efficient knockdown.
 - Single replicate of mature rat primary cortical neurons (DIV 24).
 
+This analysis was performed in R except where noted.
+The source code and instructions for rerunning the analysis can be found at [github.com/eturkes/bag3-co-ip](https://github.com/eturkes/bag3-co-ip).
+
 # Final Results {-}
 
 Read just this section for the final results of the analysis and a summary of the methods.
@@ -140,7 +143,7 @@ dt <- data.table::data.table(readxl::read_excel(
 # Rename and reduce columns.
 cols <- c(
     "Genes",
-    "Abundance Ratio: log2(scr/SH)",
+    "Abundance Ratio: log2(scr/sh)",
     "scrRNA Abundance",
     "shBAG3 Abundance"
 )
@@ -202,8 +205,7 @@ eturkesRutils::datatable(dt_abun) %>%
 The data wrangling thus far reveals several issues that we will attempt to tackle:
 
 - Missing values in the "shBAG3 Abundance" column, which make true ratio calculations impossible.
-- Maximum thresholds in the abundance ratio calculations, imposed by Proteome Discoverer for ratios above 100.
-- log2 normalized abundance ratios, which complicate interpretation without added benefit due to the lack of negative ratios.
+- log2 normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
 - Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
 ## Missing Value Imputation {.tabset}
@@ -226,7 +228,7 @@ Additionally, we try two custom techniques:
 - 10% Min: A variation of the HM technique which uses 10% of the minimum due to the reported 90% knockdown efficiency of the shBAG3 condition.
 - Within Condition Min: Takes the per condition minimum and applies it to all missing values within that condition.
 
-Note that in the previous data tables, the maximal value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
+Note that in the previous data tables, the maximum value of the abundance ratio was 6.64, representing the log2 of 100 fold change.
 This maximum is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
 
 ```{r}
@@ -262,7 +264,7 @@ dt_tmp <- dt[order(dt[[cols[1]]])]
 ### GSimp
 
 Despite heavy debugging, including forking GSimp and dependencies, attempts to run GSimp on our data was unsuccessful while example data completed with success.
-Therefore, we simply show a summary of the debugging session below.
+Debug reports were sent to upstream and we simply show a summary of the debugging session below.
 
 #### Top to bottom debug flow leading to error
 ![](../data/debug/mydata-top-to-bottom-debug.png)
@@ -386,6 +388,7 @@ eturkesRutils::datatable(dt_cond_min) %>%
 
 In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the "Specificity with BAG3" sort scheme.
 Note GSimp is missing because it failed to run (see its tab for debug details).
+The ranking ranges from 1-95.
 
 ```{r}
 # Initialize data table.
@@ -428,7 +431,34 @@ eturkesRutils::datatable(dt_mvi_benchmark) %>%
     DT::formatStyle("Missing Value Genes", `text-align` = "center")
 ```
 
-## Removal of Maximum Threshold
+It appears that QRILC and HM produce similar results, imputing values close to the scrRNA values, effectively resulting in a low fold change and rank towards the tail end of the range.
+On the otherhand, 10% Min centers the rankings and Within Condition Min produces rankings near the head of the range, similar to the original rankings.
+
+To further explore these distributions, we can assess the normality of the abundance ratio calculation after imputation.
+
+```{r}
+df_abun_ratio <- data.table::data.table(
+    "QRILC" = dt_qrilc[[cols[2]]],
+    "HM" = dt_hm[[cols[2]]],
+    "10% Min" = dt_10min[[cols[2]]],
+    "Within Condition Min" = dt_cond_min[[cols[2]]]
+)
+df_abun_ratio <- reshape2::melt(df_abun_ratio, id.vars = NULL)
+
+plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = variable)) +
+    ggplot2::geom_density(alpha = 0.25) +
+    ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
+)
+
+# plotly::ggplotly(ggplot2::ggplot(dt_10min, ggplot2::aes(`Abundance Ratio: log2(scr/sh)`)) +
+#     ggplot2::geom_histogram(bins = 100, fill = "gray", color = "black")
+# )
+
+plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = variable)) +
+    ggplot2::geom_histogram(alpha = 0.25, bins = 10) +
+    ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
+)
+```
 
 ## Renormalization
 
