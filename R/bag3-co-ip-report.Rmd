@@ -93,12 +93,15 @@ The background for this data is as follows:
 This analysis was performed in R except where noted.
 The source code and instructions for rerunning the analysis can be found at [github.com/eturkes/bag3-co-ip](https://github.com/eturkes/bag3-co-ip).
 
-# Final Results {-}
+# Final Results
 
 **Read just this section for the final results of the analysis and a summary of the methods.**
 
+## Cleaned Dataset {.tabset}
+
 The following is the final Co-IP MS dataset after cleaning as described in this report's method section.
 Briefly, the original dataset was subject to missing value imputation via a custom method, renormalized, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
+Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 
 ```{r, include = TRUE, echo = FALSE}
 cols <- c(
@@ -109,18 +112,43 @@ cols <- c(
 )
 
 dt_final <- readRDS("../results/dt_final.rds")
+```
 
-eturkesRutils::datatable(dt_final) %>%
+### Specificity with BAG3
+
+```{r, include = TRUE, echo = FALSE}
+# Secondary sorted by "shBAG3 Abundance" ascending.
+dt_final_spec <- dt_final[order(-dt_final[[cols[2]]], dt_final[[cols[4]]]), ]
+rownames(dt_final_spec) <- NULL
+
+eturkesRutils::datatable(dt_final_spec) %>%
     DT::formatRound(2) %>%
     DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
-# Original Data {-}
-
-This section contains the original data received from the mass spec facility and was mainly processed using Proteome Discoverer from Thermo Fisher.
-The table below is unedited except for minimal formatting outside of R for easier import.
+### Abundance of Protein
 
 ```{r, include = TRUE, echo = FALSE}
+# Secondary sorted by "shBAG3 Abundance" descending.
+dt_final_abun <- dt_final[order(-dt_final[[cols[3]]], -dt_final[[cols[4]]]), ]
+rownames(dt_final_abun) <- NULL
+
+eturkesRutils::datatable(dt_final_abun) %>%
+    DT::formatRound(2) %>%
+    DT::formatStyle(cols[1], `text-align` = "center")
+```
+
+# ~~~~ Breakdown of Methods ~~~~ {-}
+
+The following sections breakdown the methods used to transform the contents in `Original Data` to those in `Final Results`.
+
+# Original Data
+
+This section contains the original data received from the mass spec facility and was mainly processed using Proteome Discoverer from Thermo Fisher.
+Standard cleaning such as removal of keratin and lowly abundant peptides was already performed.
+The table below is unedited except for minimal formatting outside of R for easier import.
+
+```{r}
 dt <- data.table::data.table(readxl::read_excel(
     "../data/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
@@ -143,10 +171,6 @@ DT::datatable(
     )
 )
 ```
-
-# Breakdown of Methods {-}
-
-The following sections breakdown the methods used to transform the contents in `Original Data` to those in `Final Results`.
 
 # Preliminary Cleaning
 
