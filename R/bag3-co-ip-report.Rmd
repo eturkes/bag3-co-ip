@@ -106,7 +106,7 @@ Two sort schemes are presented, one to show specificity with BAG3 and another to
 ```{r, include = TRUE, echo = FALSE}
 cols <- c(
     "Genes",
-    "Abundance Ratio: log2(scr/sh)",
+    "Abundance Ratio: (scr/sh)",
     "scrRNA Abundance",
     "shBAG3 Abundance"
 )
@@ -510,6 +510,7 @@ Next, we scale these values to a range of $0-100$ to allow for easier comparison
 ```{r}
 scale_factor <- 100 / max(dt_10min[[cols[2]]])
 dt_10min[[cols[2]]] <- dt_10min[[cols[2]]] * scale_factor
+colnames(dt_10min)[2] <- "Abundance Ratio: (scr/sh)"
 
 eturkesRutils::datatable(dt_10min) %>%
     DT::formatRound(2) %>%
