@@ -1,8 +1,11 @@
 ---
 title: "BAG3 Co-IP MS Report"
-author: "Emir Turkes"
+author:
+    - name: "Emir Turkes"
+    - name: "Columbia University"
 date: '`r strftime(Sys.time(), format = "%B %d, %Y")`'
 bibliography: "../bag3-co-ip.bib"
+biblio-style: apalike
 link-citations: true
 output:
     html_document:
