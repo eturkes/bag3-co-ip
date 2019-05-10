@@ -17,15 +17,12 @@ output:
       collapsed:     false
       smooth_scroll: false
 
-knit: (
-  function(inputFile, encoding) {
-    rmarkdown::render(
-      inputFile,
-      encoding = encoding,
-      output_file = "../results/bag3-co-ip-report.html"
-      )
-    }
-  )
+knit:
+  (function(inputFile, encoding) {rmarkdown::render(
+    inputFile,
+    encoding = encoding,
+    output_file = "../results/bag3-co-ip-report.html"
+  )})
 ---
 
 ```{r, include = FALSE}
