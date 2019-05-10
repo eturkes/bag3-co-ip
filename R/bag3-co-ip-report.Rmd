@@ -186,7 +186,7 @@ dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
 # From my own package, provides custom formatting.
 eturkesRutils::datatable(dt) %>%
-    DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ## Sort Schemes {.tabset}
