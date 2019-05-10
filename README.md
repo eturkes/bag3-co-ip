@@ -15,6 +15,10 @@ limitations under the License.
 -->
 
 # BAG3 Co-IP MS Analysis
-#### *This analysis is currently incomplete*
+#### *This analysis is complete*
 
-Analysis of BAG3 Co-IP MS data
+Analysis of BAG3 Co-IP MS data  
+
+In order to run and view the results of this analysis, the prerequisite data is required.
+Please contact me at emir.turkes@eturkes.com if you are interested.
+Otherwise, feel free to reuse this codebase in accordance with the license terms.
