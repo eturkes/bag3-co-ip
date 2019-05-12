@@ -15,7 +15,7 @@ limitations under the License.
 -->
 
 # BAG3 Co-IP MS Analysis
-#### *This analysis is complete*
+#### *This analysis is considered complete and should not see major updates*
 
 Analysis of BAG3 Co-IP MS data  
 
