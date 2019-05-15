@@ -42,7 +42,7 @@ knit:
 
 knitr::opts_chunk$set(echo = TRUE)
 
-library("magrittr")
+library(magrittr)
 ```
 
 <style type="text/css">
