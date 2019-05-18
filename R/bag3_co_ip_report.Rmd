@@ -176,9 +176,7 @@ dt[is.na(dt)] <- 0 # We replace NA with 0s for now to make sorting easier.
 # This is done manually, as there is currently no Watson for Drug Discovery API.
 dt[[cols[1]]] <- stringr::str_extract(dt[[cols[1]]], "(?<=GN=).*(?= PE=)")
 dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
-watson_genes <- data.table::fread(
-  "../assets/watson/EntitySet_bag3-co-ip-basic-clean_2019-04-18_16-41-05.csv"
-)
+watson_genes <- data.table::fread("../assets/watson/EntitySet-bag3-co-ip.csv")
 dt[[cols[1]]] <- watson_genes[["Entity name"]]
 
 # From my own package, provides custom formatting.
@@ -438,11 +436,12 @@ Some of this work has been done already in the previous section, namely, the max
 Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
 
 ```{r}
-scale_factor <- 100 / max(dt_10min[[cols[2]]])
-dt_10min[[cols[2]]] <- dt_10min[[cols[2]]] * scale_factor
-colnames(dt_10min)[2] <- "Abundance Ratio: (scr/sh)"
+dt < dt_10min
+scale_factor <- 100 / max(dt[[cols[2]]])
+dt[[cols[2]]] <- dt[[cols[2]]] * scale_factor
+colnames(dt)[2] <- "Abundance Ratio: (scr/sh)"
 
-eturkesRutils::datatable(dt_10min) %>%
+eturkesRutils::datatable(dt) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -463,23 +462,53 @@ The table is sorted from highest p values to low, to show what might be filtered
 
 ```{r}
 ibb_out <- ibb::ibb.test(
-  dt_10min[ , 3:4], colSums(dt_10min[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1
+  dt[ , 3:4], colSums(dt[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1
 )
-dt_10min <- cbind(dt_10min, ibb_out$p.value)
-colnames(dt_10min)[5] <- "p-value"
-dt_10min <- dt_10min[order(-dt_10min$"p-value")]
+dt <- cbind(dt, ibb_out$p.value)
+colnames(dt)[5] <- "p-value"
+dt <- dt[order(-dt$"p-value")]
 
-eturkesRutils::datatable(dt_10min) %>%
+eturkesRutils::datatable(dt) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries in the above list, and sort from low to high p-values.
 
 ```{r}
-dt_10min <- dt_10min[dt_10min$"p-value" < 0.05, ]
-dt_10min <- dt_10min[order(dt_10min$"p-value")]
+dt <- dt[dt$"p-value" < 0.05, ]
+dt <- dt[order(dt$"p-value")]
 
-eturkesRutils::datatable(dt_10min) %>%
+eturkesRutils::datatable(dt) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
+```
+
+# Additional Validation
+
+Here we explore additional measures to validate the data without targeting specific issues.
+
+## Watson for Drug Discovery
+
+Watson for Drug Discovery (WDD) is a text-mining platform that has built a massive corpus of scientific insights drawn from publications and other data forms.
+By inputting our data into the platform, we can use various measures from WDD to infer the likelihood that the contents and order are true.
+Note that due to the lack of a WDD API, this section was done manually rather than programmatically.
+
+We first begin by inputing our gene list thus far into WDD.
+As WDD does not take into account order, the sort scheme does not matter.
+As seen in the figure below, WDD only found literature relating BAG3 to a handful of our Co-IP genes, even with the most minimal threshold parameters.
+
+![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png)
+
+This network expands greatly if we also include intermediate connections to BAG3, revealing genes that have not been reported to interact directly with BAG3 but do interact with one or more or the genes above.
+
+![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png)
+
+By importing the graph data into R, we can see which of these intermediate genes, if any, are also in our Co-IP list.
+
+```{r}
+watson_rel_graph <- data.table::fread(
+  "../assets/watson/relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"
+)
+watson_rel_graph <- watson_rel_graph[ , c("Source name", "Target name"), with = FALSE]
+watson_inter_genes <- rapply(watson_rel_graph, function(x) unique(x))
 ```
 
 # Conclusion
@@ -488,7 +517,7 @@ This concludes the methods used in this analysis.
 Below we simply write the data to disk for exploration in `Final Results` at the top of this report.
 
 ```{r}
-saveRDS(dt_10min, file = "../results/dt_final.rds")
+saveRDS(dt, file = "../results/dt_final.rds")
 
 devtools::session_info()
 ```
