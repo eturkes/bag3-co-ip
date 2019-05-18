@@ -104,28 +104,28 @@ Briefly, the original dataset was subject to missing value imputation via a cust
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 
 ```{r, include = TRUE, echo = FALSE}
-dt_final <- readRDS("../results/dt_final.rds")
+co_ip_genes <- readRDS("../results/co_ip_genes_final.rds")
 ```
 
 ### Specificity with BAG3
 
 ```{r, include = TRUE, echo = FALSE}
 cols <- c("Genes", "Abundance Ratio: (scr/sh)", "scrRNA Abundance", "shBAG3 Abundance")
-dt_final_spec <- dt_final[order(-dt_final[[cols[2]]], dt_final[[cols[4]]]), ]
-rownames(dt_final_spec) <- NULL # Reset row numbers
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
+rownames(co_ip_genes) <- NULL # Reset row numbers
 
 # From my own package, provides custom formatting.
-eturkesRutils::datatable(dt_final_spec) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
 ```{r, include = TRUE, echo = FALSE}
-dt_final_abun <- dt_final[order(-dt_final[[cols[3]]], -dt_final[[cols[4]]]), ]
-rownames(dt_final_abun) <- NULL
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
+rownames(co_ip_genes) <- NULL
 
-eturkesRutils::datatable(dt_final_abun) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -140,13 +140,13 @@ Standard cleaning such as removal of keratin and lowly abundant peptides was alr
 The table below is unedited except for minimal formatting outside of R for easier import.
 
 ```{r}
-dt <- data.table::data.table(readxl::read_excel(
+co_ip_genes <- data.table::data.table(readxl::read_excel(
   "../assets/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
 
 # This should use eturkesRutils::datatable but the exponential conversion didn't work on this table.
 # So, we recreate it excluding that feature.
-DT::datatable(dt, extensions = "Buttons", options = list(dom = "Blfrtip", buttons = list(
+DT::datatable(co_ip_genes, extensions = "Buttons", options = list(dom = "Blfrtip", buttons = list(
   "copy", "print", list(extend = "collection", buttons = c("csv", "excel", "pdf"), text = "Download")
 )))
 ```
@@ -157,30 +157,30 @@ First, we do some very basic modifications that improve presentation of the tabl
 In best case scenarios, this may be all that is needed.
 
 ```{r}
-dt <- data.table::data.table(readxl::read_excel(
+co_ip_genes <- data.table::data.table(readxl::read_excel(
   "../assets/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"
 ))
 
 # Rename and reduce columns.
 cols <- c("Genes", "Abundance Ratio: log2(scr/sh)", "scrRNA Abundance", "shBAG3 Abundance")
-dt <- plyr::rename(dt, c(
+co_ip_genes <- plyr::rename(co_ip_genes, c(
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
   "Scr Abundances" = cols[3], "SH Abundances" = cols[4]
 ))
-dt <- dt[, cols, with = FALSE]
-dt[is.na(dt)] <- 0 # We replace NA with 0s for now to make sorting easier.
+co_ip_genes <- co_ip_genes[, cols, with = FALSE]
+co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sorting easier.
 
 # Extract gene names from the "Genes" column, removing entries that lack a name.
 # The column of genes are then fed into IBM Watson and converted into Watson entities.
 # They are then replaced with the Watson entities to facilitate easy comparison.
 # This is done manually, as there is currently no Watson for Drug Discovery API.
-dt[[cols[1]]] <- stringr::str_extract(dt[[cols[1]]], "(?<=GN=).*(?= PE=)")
-dt <- dt[rowSums(is.na(dt[ , 1]))!=1, ]
+co_ip_genes[[cols[1]]] <- stringr::str_extract(co_ip_genes[[cols[1]]], "(?<=GN=).*(?= PE=)")
+co_ip_genes <- co_ip_genes[rowSums(is.na(co_ip_genes[ , 1]))!=1, ]
 watson_genes <- data.table::fread("../assets/watson/EntitySet-bag3-co-ip.csv")
-dt[[cols[1]]] <- watson_genes[["Entity name"]]
+co_ip_genes[[cols[1]]] <- watson_genes[["Entity name"]]
 
 # From my own package, provides custom formatting.
-eturkesRutils::datatable(dt) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -193,18 +193,18 @@ The schemes can be cycled through the tabs below.
 ### Specificity with BAG3
 
 ```{r}
-dt_spec <- dt[order(-dt[[cols[2]]], dt[[cols[4]]]), ]
+co_ip_genes_spec <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_spec) %>%
+eturkesRutils::datatable(co_ip_genes_spec) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
 ```{r}
-dt_abun <- dt[order(-dt[[cols[3]]], -dt[[cols[4]]]), ]
+co_ip_genes_abun <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_abun) %>%
+eturkesRutils::datatable(co_ip_genes_abun) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -242,24 +242,26 @@ This maximum is an arbitrary limit set by Proteome Discoverer and we remove it f
 ```{r}
 # Data must be made "tidy".
 cols_mvi <- cols[cols != cols[2]]
-dt_mvi <- dt[, cols_mvi, with = FALSE]
-dt_mvi[dt_mvi == 0] <- NA
-dt_mvi <- data.table::melt.data.table(
-  dt_mvi, id = cols[1], variable.name = "group", variable.factor = TRUE
+co_ip_genes_mvi <- co_ip_genes[, cols_mvi, with = FALSE]
+co_ip_genes_mvi[co_ip_genes_mvi == 0] <- NA
+co_ip_genes_mvi <- data.table::melt.data.table(
+  co_ip_genes_mvi, id = cols[1], variable.name = "group", variable.factor = TRUE
 )
-dt_mvi <- tidyr::spread(dt_mvi, cols[1], "value")
-data.table::setDF(dt_mvi)
+co_ip_genes_mvi <- tidyr::spread(co_ip_genes_mvi, cols[1], "value")
+data.table::setDF(co_ip_genes_mvi)
 
 # Using numeric instead of integer in the MVI functions produce errors, so we convert for now.
 # Not a great solution because we lose information (as insignificant it may be).
-dt_mvi[sapply(dt_mvi, is.numeric)] <- lapply(dt_mvi[sapply(dt_mvi, is.numeric)], as.integer)
+co_ip_genes_mvi[sapply(co_ip_genes_mvi, is.numeric)] <- lapply(
+  co_ip_genes_mvi[sapply(co_ip_genes_mvi, is.numeric)], as.integer
+)
 
 # GSimp is capable of group-wise filtering with an optional "group" column according to the authors.
 # However, there is no good example provided, so we move groups to row names.
-dt_mvi <- data.frame(dt_mvi[ , -1], row.names = dt_mvi[ , 1])
+co_ip_genes_mvi <- data.frame(co_ip_genes_mvi[ , -1], row.names = co_ip_genes_mvi[ , 1])
 
 # Prepare original table for merge.
-dt_tmp <- dt[order(dt[[cols[1]]])]
+co_ip_genes_tmp <- co_ip_genes[order(co_ip_genes[[cols[1]]])]
 ```
 
 ### GSimp
@@ -276,99 +278,107 @@ Debug reports were sent to upstream and we simply show a summary of the debuggin
 ### QRILC
 
 ```{r}
-dt_qrilc_tmp <- imputeLCMD::impute.QRILC(dt_mvi) %>% extract2(1)
+co_ip_genes_qrilc_tmp <- imputeLCMD::impute.QRILC(co_ip_genes_mvi) %>% extract2(1)
 
 # "Untidy" data.
-dt_qrilc_tmp <- tibble::rownames_to_column(dt_qrilc_tmp)
-dt_qrilc <- data.frame(t(dt_qrilc_tmp[-1]))
-colnames(dt_qrilc) <- dt_qrilc_tmp[ , 1]
-dt_qrilc <- tibble::rownames_to_column(dt_qrilc, var = "Genes")
-data.table::setDT(dt_qrilc)
-dt_tmp[[cols[4]]] <- dt_qrilc[[cols[4]]]
-dt_qrilc <- dt_tmp
+co_ip_genes_qrilc_tmp <- tibble::rownames_to_column(co_ip_genes_qrilc_tmp)
+co_ip_genes_qrilc <- data.frame(t(co_ip_genes_qrilc_tmp[-1]))
+colnames(co_ip_genes_qrilc) <- co_ip_genes_qrilc_tmp[ , 1]
+co_ip_genes_qrilc <- tibble::rownames_to_column(co_ip_genes_qrilc, var = "Genes")
+data.table::setDT(co_ip_genes_qrilc)
+co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_qrilc[[cols[4]]]
+co_ip_genes_qrilc <- co_ip_genes_tmp
 
 # Recalculate abundance ratio.
-dt_qrilc[[cols[2]]] <- log2(dt_qrilc[[cols[3]]] / dt_qrilc[[cols[4]]])
+co_ip_genes_qrilc[[cols[2]]] <- log2(co_ip_genes_qrilc[[cols[3]]] / co_ip_genes_qrilc[[cols[4]]])
 
 # Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
-dt_qrilc <- dt_qrilc[order(-dt_qrilc[[cols[2]]], dt_qrilc[[cols[4]]]), ]
+co_ip_genes_qrilc <- co_ip_genes_qrilc[
+  order(-co_ip_genes_qrilc[[cols[2]]], co_ip_genes_qrilc[[cols[4]]]),
+]
 
-eturkesRutils::datatable(dt_qrilc) %>%
+eturkesRutils::datatable(co_ip_genes_qrilc) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### HM
 
 ```{r}
-dt_hm_tmp <- dt_mvi
-dt_hm_tmp[] <- lapply(dt_mvi, function(x) {
+co_ip_genes_hm_tmp <- co_ip_genes_mvi
+co_ip_genes_hm_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
   x[is.na(x)] <- min(x, na.rm = TRUE) / 2
   x
 })
 
-dt_hm_tmp <- tibble::rownames_to_column(dt_hm_tmp)
-dt_hm <- data.frame(t(dt_hm_tmp[-1]))
-colnames(dt_hm) <- dt_hm_tmp[ , 1]
-dt_hm <- tibble::rownames_to_column(dt_hm, var = "Genes")
-data.table::setDT(dt_hm)
-dt_tmp[[cols[4]]] <- dt_hm[[cols[4]]]
-dt_hm <- dt_tmp
+co_ip_genes_hm_tmp <- tibble::rownames_to_column(co_ip_genes_hm_tmp)
+co_ip_genes_hm <- data.frame(t(co_ip_genes_hm_tmp[-1]))
+colnames(co_ip_genes_hm) <- co_ip_genes_hm_tmp[ , 1]
+co_ip_genes_hm <- tibble::rownames_to_column(co_ip_genes_hm, var = "Genes")
+data.table::setDT(co_ip_genes_hm)
+co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_hm[[cols[4]]]
+co_ip_genes_hm <- co_ip_genes_tmp
 
-dt_hm[[cols[2]]] <- log2(dt_hm[[cols[3]]] / dt_hm[[cols[4]]])
+co_ip_genes_hm[[cols[2]]] <- log2(co_ip_genes_hm[[cols[3]]] / co_ip_genes_hm[[cols[4]]])
 
-dt_hm <- dt_hm[order(-dt_hm[[cols[2]]], dt_hm[[cols[4]]]), ]
+co_ip_genes_hm <- co_ip_genes_hm[order(-co_ip_genes_hm[[cols[2]]], co_ip_genes_hm[[cols[4]]]), ]
 
-eturkesRutils::datatable(dt_hm) %>%
+eturkesRutils::datatable(co_ip_genes_hm) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### 10% Min
 
 ```{r}
-dt_10min_tmp <- dt_mvi
-dt_10min_tmp[] <- lapply(dt_mvi, function(x) {
+co_ip_genes_10min_tmp <- co_ip_genes_mvi
+co_ip_genes_10min_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
   x[is.na(x)] <- min(x, na.rm = TRUE) * 0.10
   x
 })
 
-dt_10min_tmp <- tibble::rownames_to_column(dt_10min_tmp)
-dt_10min <- data.frame(t(dt_10min_tmp[-1]))
-colnames(dt_10min) <- dt_10min_tmp[ , 1]
-dt_10min <- tibble::rownames_to_column(dt_10min, var = "Genes")
-data.table::setDT(dt_10min)
-dt_tmp[[cols[4]]] <- dt_10min[[cols[4]]]
-dt_10min <- dt_tmp
+co_ip_genes_10min_tmp <- tibble::rownames_to_column(co_ip_genes_10min_tmp)
+co_ip_genes_10min <- data.frame(t(co_ip_genes_10min_tmp[-1]))
+colnames(co_ip_genes_10min) <- co_ip_genes_10min_tmp[ , 1]
+co_ip_genes_10min <- tibble::rownames_to_column(co_ip_genes_10min, var = "Genes")
+data.table::setDT(co_ip_genes_10min)
+co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_10min[[cols[4]]]
+co_ip_genes_10min <- co_ip_genes_tmp
 
-dt_10min[[cols[2]]] <- log2(dt_10min[[cols[3]]] / dt_10min[[cols[4]]])
+co_ip_genes_10min[[cols[2]]] <- log2(co_ip_genes_10min[[cols[3]]] / co_ip_genes_10min[[cols[4]]])
 
-dt_10min <- dt_10min[order(-dt_10min[[cols[2]]], dt_10min[[cols[4]]]), ]
+co_ip_genes_10min <- co_ip_genes_10min[
+  order(-co_ip_genes_10min[[cols[2]]], co_ip_genes_10min[[cols[4]]]),
+]
 
-eturkesRutils::datatable(dt_10min) %>%
+eturkesRutils::datatable(co_ip_genes_10min) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Within Condition Min
 
 ```{r}
-dt_cond_min_tmp <- dt_mvi
-dt_cond_min_tmp[] <- lapply(dt_mvi, function(x) {
-  x[is.na(x)] <- min(dt_mvi[2, ], na.rm = TRUE)
+co_ip_genes_cond_min_tmp <- co_ip_genes_mvi
+co_ip_genes_cond_min_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
+  x[is.na(x)] <- min(co_ip_genes_mvi[2, ], na.rm = TRUE)
   x
 })
 
-dt_cond_min_tmp <- tibble::rownames_to_column(dt_cond_min_tmp)
-dt_cond_min <- data.frame(t(dt_cond_min_tmp[-1]))
-colnames(dt_cond_min) <- dt_cond_min_tmp[ , 1]
-dt_cond_min <- tibble::rownames_to_column(dt_cond_min, var = "Genes")
-data.table::setDT(dt_cond_min)
-dt_tmp[[cols[4]]] <- dt_cond_min[[cols[4]]]
-dt_cond_min <- dt_tmp
+co_ip_genes_cond_min_tmp <- tibble::rownames_to_column(co_ip_genes_cond_min_tmp)
+co_ip_genes_cond_min <- data.frame(t(co_ip_genes_cond_min_tmp[-1]))
+colnames(co_ip_genes_cond_min) <- co_ip_genes_cond_min_tmp[ , 1]
+co_ip_genes_cond_min <- tibble::rownames_to_column(co_ip_genes_cond_min, var = "Genes")
+data.table::setDT(co_ip_genes_cond_min)
+co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_cond_min[[cols[4]]]
+co_ip_genes_cond_min <- co_ip_genes_tmp
 
-dt_cond_min[[cols[2]]] <- log2(dt_cond_min[[cols[3]]] / dt_cond_min[[cols[4]]])
+co_ip_genes_cond_min[[cols[2]]] <- log2(
+  co_ip_genes_cond_min[[cols[3]]] / co_ip_genes_cond_min[[cols[4]]]
+)
 
-dt_cond_min <- dt_cond_min[order(-dt_cond_min[[cols[2]]], dt_cond_min[[cols[4]]]), ]
+co_ip_genes_cond_min <- co_ip_genes_cond_min[
+  order(-co_ip_genes_cond_min[[cols[2]]], co_ip_genes_cond_min[[cols[4]]]),
+]
 
-eturkesRutils::datatable(dt_cond_min) %>%
+eturkesRutils::datatable(co_ip_genes_cond_min) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -381,11 +391,13 @@ The ranking ranges from $1-95$.
 ```{r}
 # Initialize data table.
 mvi_genes <- c()
-for (row in 1:nrow(dt_spec)) {if (dt_spec[[row, cols[4]]] == 0) {
-  mvi_genes <- c(mvi_genes, dt_spec[[row, cols[1]]])
+for (row in 1:nrow(co_ip_genes_spec)) {if (co_ip_genes_spec[[row, cols[4]]] == 0) {
+  mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])
 }}
-mvi_dts <- list(dt_spec, dt_qrilc, dt_hm, dt_10min, dt_cond_min)
-dt_mvi_benchmark <- data.table::data.table(
+mvi_dts <- list(
+  co_ip_genes_spec, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min
+)
+mvi_benchmark <- data.table::data.table(
   "Missing Value Genes" = mvi_genes,
   "Original Rank" = 0, "QRILC Rank" = 0, "HM Rank" = 0,
   "10% Min Rank" = 0, "Within Condition Min Rank" = 0
@@ -394,14 +406,14 @@ dt_mvi_benchmark <- data.table::data.table(
 # Add values from data table list.
 col_count <- 1
 for (set in mvi_dts) {col_count <- col_count + 1
-  for (benchmark_row in 1:nrow(dt_mvi_benchmark)) {
-    for (dts_row in 1:nrow(set)) {if (set[[dts_row, 1]] == dt_mvi_benchmark[[benchmark_row, 1]]) {
-      dt_mvi_benchmark[benchmark_row, col_count] <- dts_row
+  for (benchmark_row in 1:nrow(mvi_benchmark)) {
+    for (dts_row in 1:nrow(set)) {if (set[[dts_row, 1]] == mvi_benchmark[[benchmark_row, 1]]) {
+      mvi_benchmark[benchmark_row, col_count] <- dts_row
     }}
   }
 }
 
-eturkesRutils::datatable(dt_mvi_benchmark) %>%
+eturkesRutils::datatable(mvi_benchmark) %>%
   DT::formatStyle("Missing Value Genes", `text-align` = "center")
 ```
 
@@ -411,17 +423,17 @@ On the otherhand, 10% Min centers the rankings and Within Condition Min produces
 To further explore these distributions, we can assess the normality of the abundance ratio calculation after imputation.
 
 ```{r}
-df_abun_ratio <- data.table::data.table(
-  "QRILC" = dt_qrilc[[cols[2]]], "HM" = dt_hm[[cols[2]]],
-  "10% Min" = dt_10min[[cols[2]]], "Within Condition Min" = dt_cond_min[[cols[2]]]
+abun_ratio <- data.table::data.table(
+  "QRILC" = co_ip_genes_qrilc[[cols[2]]], "HM" = co_ip_genes_hm[[cols[2]]],
+  "10% Min" = co_ip_genes_10min[[cols[2]]], "Within Condition Min" = co_ip_genes_cond_min[[cols[2]]]
 )
-df_abun_ratio <- reshape2::melt(df_abun_ratio, id.vars = NULL)
+abun_ratio <- reshape2::melt(abun_ratio, id.vars = NULL)
 
-plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = variable)) +
+plotly::ggplotly(ggplot2::ggplot(abun_ratio, ggplot2::aes(x = value, fill = variable)) +
   ggplot2::geom_density(alpha = 0.25) + ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
 )
 
-plotly::ggplotly(ggplot2::ggplot(df_abun_ratio, ggplot2::aes(x = value, fill = variable)) +
+plotly::ggplotly(ggplot2::ggplot(abun_ratio, ggplot2::aes(x = value, fill = variable)) +
   ggplot2::geom_histogram(alpha = 0.25, bins = 10) + ggplot2::xlab("Abundance Ratio: log2(scr/sh)")
 )
 ```
@@ -436,12 +448,12 @@ Some of this work has been done already in the previous section, namely, the max
 Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
 
 ```{r}
-dt < dt_10min
-scale_factor <- 100 / max(dt[[cols[2]]])
-dt[[cols[2]]] <- dt[[cols[2]]] * scale_factor
-colnames(dt)[2] <- "Abundance Ratio: (scr/sh)"
+co_ip_genes <- co_ip_genes_10min
+scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
+co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
+colnames(co_ip_genes)[2] <- "Abundance Ratio: (scr/sh)"
 
-eturkesRutils::datatable(dt) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -462,22 +474,22 @@ The table is sorted from highest p values to low, to show what might be filtered
 
 ```{r}
 ibb_out <- ibb::ibb.test(
-  dt[ , 3:4], colSums(dt[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1
+  co_ip_genes[ , 3:4], colSums(co_ip_genes[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1
 )
-dt <- cbind(dt, ibb_out$p.value)
-colnames(dt)[5] <- "p-value"
-dt <- dt[order(-dt$"p-value")]
+co_ip_genes <- cbind(co_ip_genes, ibb_out$p.value)
+colnames(co_ip_genes)[5] <- "p-value"
+co_ip_genes <- co_ip_genes[order(-co_ip_genes$"p-value")]
 
-eturkesRutils::datatable(dt) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries in the above list, and sort from low to high p-values.
 
 ```{r}
-dt <- dt[dt$"p-value" < 0.05, ]
-dt <- dt[order(dt$"p-value")]
+co_ip_genes <- co_ip_genes[co_ip_genes$"p-value" < 0.05, ]
+co_ip_genes <- co_ip_genes[order(co_ip_genes$"p-value")]
 
-eturkesRutils::datatable(dt) %>%
+eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -517,7 +529,7 @@ This concludes the methods used in this analysis.
 Below we simply write the data to disk for exploration in `Final Results` at the top of this report.
 
 ```{r}
-saveRDS(dt, file = "../results/dt_final.rds")
+saveRDS(co_ip_genes, file = "../results/co_ip_genes_final.rds")
 
 devtools::session_info()
 ```
