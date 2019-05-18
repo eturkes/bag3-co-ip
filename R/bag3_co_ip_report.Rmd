@@ -499,7 +499,7 @@ Here we explore additional measures to validate the data without targeting speci
 
 ## Watson for Drug Discovery
 
-Watson for Drug Discovery (WDD) is a text-mining platform that has built a massive corpus of scientific insights drawn from publications and other data forms.
+IBM's [Watson for Drug Discovery](https://www.ibm.com/products/watson-drug-discovery) (WDD) is a text-mining platform that has built a massive corpus of scientific insights drawn from publications and other data forms.
 By inputting our data into the platform, we can use various measures from WDD to infer the likelihood that the contents and order are true.
 Note that due to the lack of a WDD API, this section was done manually rather than programmatically.
 
@@ -521,7 +521,16 @@ watson_rel_graph <- data.table::fread(
 )
 watson_rel_graph <- watson_rel_graph[ , c("Source name", "Target name"), with = FALSE]
 watson_inter_genes <- rapply(watson_rel_graph, function(x) unique(x))
+watson_direct_genes <- c("BAG3", "HSPB8", "HSPA8", "VIM", "CAPZB", "MVP")
+watson_inter_genes <- setdiff(watson_inter_genes, watson_direct_genes)
+common_genes <- Reduce(intersect, list(watson_inter_genes, co_ip_genes[[cols[1]]]))
+
+cat(paste("The genes in common are:", common_genes, " "))
 ```
+
+There are no common intermediate genes, so we will disregard them for the rest of the analysis.
+Though it is limited to only our six direct genes, WDD provides a "confidence_score" that assesses the quality of evidence for an association.
+It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
 
 # Conclusion
 
