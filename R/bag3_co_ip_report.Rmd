@@ -478,7 +478,7 @@ ibb_out <- ibb::ibb.test(
 )
 co_ip_genes <- cbind(co_ip_genes, ibb_out$p.value)
 colnames(co_ip_genes)[5] <- "p-value"
-co_ip_genes <- co_ip_genes[order(-co_ip_genes$"p-value")]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes$`p-value`)]
 
 eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
@@ -486,8 +486,8 @@ eturkesRutils::datatable(co_ip_genes) %>%
 Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries in the above list, and sort from low to high p-values.
 
 ```{r}
-co_ip_genes <- co_ip_genes[co_ip_genes$"p-value" < 0.05, ]
-co_ip_genes <- co_ip_genes[order(co_ip_genes$"p-value")]
+co_ip_genes <- co_ip_genes[co_ip_genes$`p-value` < 0.05, ]
+co_ip_genes <- co_ip_genes[order(co_ip_genes$`p-value`)]
 
 eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
@@ -516,12 +516,21 @@ This network expands greatly if we also include intermediate connections to BAG3
 By importing the graph data into R, we can see which of these intermediate genes, if any, are also in our Co-IP list.
 
 ```{r}
-watson_rel_graph <- data.table::fread(
+watson_direct_graph <- data.table::fread(
+  "../assets/watson/relationshipgraph-bag3-co-ip-direct-to-bag3.csv"
+)
+watson_indirect_graph <- data.table::fread(
   "../assets/watson/relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"
 )
-watson_rel_graph <- watson_rel_graph[ , c("Source name", "Target name"), with = FALSE]
-watson_inter_genes <- rapply(watson_rel_graph, function(x) unique(x))
-watson_direct_genes <- c("BAG3", "HSPB8", "HSPA8", "VIM", "CAPZB", "MVP")
+watson_direct_graph <- watson_direct_graph[
+  , c("Source name", "Target name", "Confidence", "Documents"), with = FALSE
+]
+watson_indirect_graph <- watson_indirect_graph[ , c("Source name", "Target name"), with = FALSE]
+
+watson_inter_genes <- rapply(watson_indirect_graph, function(x) unique(x))
+watson_direct_genes <- unique(
+  as.vector(as.matrix(watson_direct_graph[ , c("Source name", "Target name")]))
+)
 watson_inter_genes <- setdiff(watson_inter_genes, watson_direct_genes)
 common_genes <- Reduce(intersect, list(watson_inter_genes, co_ip_genes[[cols[1]]]))
 
@@ -531,6 +540,24 @@ cat(paste("The genes in common are:", common_genes, " "))
 There are no common intermediate genes, so we will disregard them for the rest of the analysis.
 Though it is limited to only our six direct genes, WDD provides a "confidence_score" that assesses the quality of evidence for an association.
 It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
+Also, because WDD differentiates up and downstream relationships, some genes have multiple confidence scores.
+These must be combined for comparison with the Co-IP data, which does not distinguish the direction of association.
+We use the below custom equation to do so.
+
+$
+\begin{equation*}
+Confidence_{combined} = \frac{(Confidence_{down} \times Documents_{down}) + (Confidence_{up} \times Documents_{up})}{(Documents_{down} + Documents_{up})}
+\end{equation*}
+$
+
+```{r}
+watson_spread <- watson_direct_graph[
+  grepl("BAG3", watson_direct_graph$`Source name`) |
+    grepl("BAG3", watson_direct_graph$`Target name`),
+]
+
+#for (gene in 1:length(uniq_genes))
+```
 
 # Conclusion
 
