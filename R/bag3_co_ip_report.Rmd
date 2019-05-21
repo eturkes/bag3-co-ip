@@ -149,7 +149,7 @@ co_ip_genes <- plyr::rename(co_ip_genes, c(
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
   "Scr Abundances" = cols[3], "SH Abundances" = cols[4]
 ))
-co_ip_genes <- co_ip_genes[, cols, with = FALSE]
+co_ip_genes <- co_ip_genes[ , cols, with = FALSE]
 co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sorting easier.
 
 # Extract gene names from the "Genes" column, removing entries that lack a name.
@@ -159,7 +159,7 @@ co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sor
 co_ip_genes[[cols[1]]] <- stringr::str_extract(co_ip_genes[[cols[1]]], "(?<=GN=).*(?= PE=)")
 co_ip_genes <- co_ip_genes[rowSums(is.na(co_ip_genes[ , 1]))!=1, ]
 watson_genes <- data.table::fread("../assets/watson/EntitySet-bag3-co-ip.csv")
-co_ip_genes[[cols[1]]] <- watson_genes[["Entity name"]]
+co_ip_genes[[cols[1]]] <- watson_genes$`Entity name`
 
 # From my own package, provides custom formatting.
 eturkesRutils::datatable(co_ip_genes) %>%
