@@ -523,7 +523,7 @@ watson_indirect_graph <- data.table::fread(
   "../assets/watson/relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"
 )
 watson_direct_graph <- watson_direct_graph[
-  , c("Source name", "Target name", "Confidence", "Documents"), with = FALSE
+  , c("Source name", "Target name", "Confidence"), with = FALSE
 ]
 watson_indirect_graph <- watson_indirect_graph[ , c("Source name", "Target name"), with = FALSE]
 
@@ -541,22 +541,26 @@ There are no common intermediate genes, so we will disregard them for the rest o
 Though it is limited to only our six direct genes, WDD provides a "confidence_score" that assesses the quality of evidence for an association.
 It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
 Also, because WDD differentiates up and downstream relationships, some genes have multiple confidence scores.
-These must be combined for comparison with the Co-IP data, which does not distinguish the direction of association.
-We use the below custom equation to do so.
-
-$
-\begin{equation*}
-Confidence_{combined} = \frac{(Confidence_{down} \times Documents_{down}) + (Confidence_{up} \times Documents_{up})}{(Documents_{down} + Documents_{up})}
-\end{equation*}
-$
+While it would be ideal to combine confidence scores, due to the complexity of the confidence algorithm, we simply opt to choose the max value of each relationship.
 
 ```{r}
-watson_spread <- watson_direct_graph[
-  grepl("BAG3", watson_direct_graph$`Source name`) |
-    grepl("BAG3", watson_direct_graph$`Target name`),
+watson_direct_graph <- watson_direct_graph[grep("BAG3", watson_direct_graph$`Source name`), ]
+tmp <- co_ip_genes[ , 1:2]
+tmp$`Watson Confidence` <- 0
+co_ip_genes <- cbind(tmp, co_ip_genes[ , 4:5])
+for (gene in 1:nrow(watson_direct_graph)) {
+  for (row in 1:nrow(co_ip_genes)) {
+    if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
+      co_ip_genes[row, 3] <- watson_direct_graph[gene, 3]
+    }
+  }
+}
+co_ip_genes <- co_ip_genes[
+  order(-co_ip_genes$`Watson Confidence`, -co_ip_genes$`Abundance Ratio: (scr/sh)`),
 ]
 
-#for (gene in 1:length(uniq_genes))
+eturkesRutils::datatable(co_ip_genes) %>%
+  DT::formatRound(2) %>% DT::formatRound(3) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # Conclusion
