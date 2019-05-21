@@ -18,11 +18,13 @@ output:
       smooth_scroll: false
 
 knit:
-  (function(inputFile, encoding) {rmarkdown::render(
-    inputFile,
-    encoding = encoding,
-    output_file = "../results/bag3-co-ip-report.html"
-  )})
+  (function(inputFile, encoding) {
+    rmarkdown::render(
+      inputFile,
+      encoding = encoding,
+      output_file = "../results/bag3-co-ip-report.html"
+    )
+  })
 ---
 
 ```{r, include = FALSE}
@@ -47,37 +49,15 @@ library(magrittr)
 
 <style type="text/css">
 
-body{ /* Normal  */
-  font-size: 16px;
-}
-h1.title {
-  font-size: 35px;
-}
-h1 { /* Header 1 */
-  font-size: 24px;
-}
-h2 { /* Header 2 */
-  font-size: 22px;
-}
-h3 { /* Header 3 */
-  font-size: 20px;
-}
-.toc-content {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-div.tocify {
-  width: 100%;
-}
-.tocify-subheader .tocify-item {
-  font-size: 0.95em;
-  padding-left: 25px;
-  text-indent: 0;
-}
-div.main-container {
-  max-width: none;
-  width: 100%;
-}
+body{font-size: 16px;}
+h1.title {font-size: 35px;}
+h1 {font-size: 24px;}
+h2 {font-size: 22px;}
+h3 {font-size: 20px;}
+.toc-content {padding-left: 0px; padding-right: 0px;}
+div.tocify {width: 100%;}
+.tocify-subheader .tocify-item {font-size: 0.95em; padding-left: 25px; text-indent: 0;}
+div.main-container {max-width: none; width: 100%;}
 
 </style>
 
@@ -110,23 +90,25 @@ co_ip_genes <- readRDS("../results/co_ip_genes_final.rds")
 ### Specificity with BAG3
 
 ```{r, include = TRUE, echo = FALSE}
-cols <- c("Genes", "Abundance Ratio: (scr/sh)", "scrRNA Abundance", "shBAG3 Abundance")
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
+cols <- c(
+  "Genes", "Abundance Ratio: (scr/sh)", "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance"
+)
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[2]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers
 
 # From my own package, provides custom formatting.
 eturkesRutils::datatable(co_ip_genes) %>%
-  DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[4]]], -co_ip_genes[[cols[5]]]), ]
 rownames(co_ip_genes) <- NULL
 
 eturkesRutils::datatable(co_ip_genes) %>%
-  DT::formatRound(2) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # ~~~~ Breakdown of Methods ~~~~ {-}
@@ -391,9 +373,11 @@ The ranking ranges from $1-95$.
 ```{r}
 # Initialize data table.
 mvi_genes <- c()
-for (row in 1:nrow(co_ip_genes_spec)) {if (co_ip_genes_spec[[row, cols[4]]] == 0) {
-  mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])
-}}
+for (row in 1:nrow(co_ip_genes_spec)) {
+  if (co_ip_genes_spec[[row, cols[4]]] == 0) {
+    mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])
+  }
+}
 mvi_dts <- list(
   co_ip_genes_spec, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min
 )
@@ -405,11 +389,14 @@ mvi_benchmark <- data.table::data.table(
 
 # Add values from data table list.
 col_count <- 1
-for (set in mvi_dts) {col_count <- col_count + 1
+for (set in mvi_dts) {
+  col_count <- col_count + 1
   for (benchmark_row in 1:nrow(mvi_benchmark)) {
-    for (dts_row in 1:nrow(set)) {if (set[[dts_row, 1]] == mvi_benchmark[[benchmark_row, 1]]) {
-      mvi_benchmark[benchmark_row, col_count] <- dts_row
-    }}
+    for (dts_row in 1:nrow(set)) {
+      if (set[[dts_row, 1]] == mvi_benchmark[[benchmark_row, 1]]) {
+        mvi_benchmark[benchmark_row, col_count] <- dts_row
+      }
+    }
   }
 }
 
@@ -547,7 +534,8 @@ While it would be ideal to combine confidence scores, due to the complexity of t
 watson_direct_graph <- watson_direct_graph[grep("BAG3", watson_direct_graph$`Source name`), ]
 tmp <- co_ip_genes[ , 1:2]
 tmp$`Watson Confidence` <- 0
-co_ip_genes <- cbind(tmp, co_ip_genes[ , 4:5])
+co_ip_genes <- cbind(tmp, co_ip_genes[ , 3:5])
+
 for (gene in 1:nrow(watson_direct_graph)) {
   for (row in 1:nrow(co_ip_genes)) {
     if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
@@ -555,12 +543,13 @@ for (gene in 1:nrow(watson_direct_graph)) {
     }
   }
 }
+
 co_ip_genes <- co_ip_genes[
   order(-co_ip_genes$`Watson Confidence`, -co_ip_genes$`Abundance Ratio: (scr/sh)`),
 ]
 
 eturkesRutils::datatable(co_ip_genes) %>%
-  DT::formatRound(2) %>% DT::formatRound(3) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # Conclusion
