@@ -91,24 +91,25 @@ co_ip_genes <- readRDS("../results/co_ip_genes_final.rds")
 
 ```{r, include = TRUE, echo = FALSE}
 cols <- c(
-  "Genes", "Abundance Ratio: (scr/sh)", "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance"
+  "Genes", "Specificity: avg(Abun. Ratio, Watson)", "Abundance Ratio: (scr/sh)",
+  "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance"
 )
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[2]]]), ]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[6]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers
 
 # From my own package, provides custom formatting.
 eturkesRutils::datatable(co_ip_genes) %>%
-  DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[4]]], -co_ip_genes[[cols[5]]]), ]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[5]]], -co_ip_genes[[cols[6]]]), ]
 rownames(co_ip_genes) <- NULL
 
 eturkesRutils::datatable(co_ip_genes) %>%
-  DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # ~~~~ Breakdown of Methods ~~~~ {-}
@@ -550,6 +551,29 @@ co_ip_genes <- co_ip_genes[
 
 eturkesRutils::datatable(co_ip_genes) %>%
   DT::formatRound(c(2, 3)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+```
+
+We see that Watson ranks some previously mid/low tier genes quite highly.
+In order to better integrate the two scores, we can combine them in a very simple way, where we average the two scores together, but only if the abundance ratio is higher than the Watson confidence score.
+We choose to do this because any appearance of gene in Watson should potentially increase, but never decrease, the likelihood that it truly Co-IP's with BAG3, even when there is a low confidence score.
+
+```{r}
+tmp <- co_ip_genes[ , 1]
+tmp$`Specificity: avg(Abun. Ratio, Watson)` <- co_ip_genes$`Abundance Ratio: (scr/sh)`
+co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
+
+for (row in 1:nrow(co_ip_genes)) {
+  if (co_ip_genes[row, 4] > co_ip_genes[row, 3]) {
+    co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 3]) / 2 )
+  }
+}
+
+co_ip_genes <- co_ip_genes[
+  order(-co_ip_genes$`Specificity: avg(Abun. Ratio, Watson)`, co_ip_genes[[cols[4]]]),
+]
+
+eturkesRutils::datatable(co_ip_genes) %>%
+  DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # Conclusion
