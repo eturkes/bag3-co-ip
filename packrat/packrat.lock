@@ -153,18 +153,18 @@ Requires: BH, R6, Rcpp, assertthat, glue, magrittr, pkgconfig, plogr,
 
 Package: eturkesRutils
 Source: github
-Version: 0.3.1
-Hash: ed8ad8e6f2f09051a93a00b6698a4408
+Version: 0.3.2
+Hash: 53c577302e0439ae4c219887d785aa83
 Requires: DT, magrittr
 GithubRepo: eturkesRutils
 GithubUsername: eturkes
 GithubRef: master
-GithubSha1: fd90543309b114cca7fc08f526e0b4805f4b8942
+GithubSha1: 7ebf1eaeb2c8266059efca4fe3acf952ef89a3f9
 RemoteHost: api.github.com
 RemoteRepo: eturkesRutils
 RemoteUsername: eturkes
 RemoteRef: master
-RemoteSha: fd90543309b114cca7fc08f526e0b4805f4b8942
+RemoteSha: 7ebf1eaeb2c8266059efca4fe3acf952ef89a3f9
 
 Package: evaluate
 Source: CRAN
@@ -588,6 +588,12 @@ Source: CRAN
 Version: 1.1.4
 Hash: f3f97ce59092abc8ed3fd098a59e236c
 
+Package: vctrs
+Source: CRAN
+Version: 0.1.0
+Hash: a03152baad7a9b92950b29f528dae6a7
+Requires: backports, digest, glue, rlang, zeallot
+
 Package: viridisLite
 Source: CRAN
 Version: 0.3.0
@@ -623,6 +629,11 @@ Package: yaml
 Source: CRAN
 Version: 2.2.0
 Hash: a5ad5616d83d89f8d84cbf3cf4034e13
+
+Package: zeallot
+Source: CRAN
+Version: 0.1.0
+Hash: 10b2ed48e202b4db421ae864041dc4b2
 
 Package: zoo
 Source: CRAN
