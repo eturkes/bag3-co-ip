@@ -77,13 +77,13 @@ Two sort schemes are presented, one to show specificity with BAG3 and another to
 
 ```{r, include = TRUE, echo = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "co_ip_genes_final.rds"))
+cols <- c("Genes", "Specificity: avg(Abun. Ratio, Watson)", "Abundance Ratio: (scr/sh)",
+          "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
 ```
 
 ### Specificity with BAG3
 
 ```{r, include = TRUE, echo = FALSE}
-cols <- c("Genes", "Specificity: avg(Abun. Ratio, Watson)", "Abundance Ratio: (scr/sh)",
-          "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[6]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
