@@ -76,7 +76,7 @@ Briefly, the original dataset was subject to missing value imputation via a cust
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- readRDS("../results/co_ip_genes_final.rds")
+co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "co_ip_genes_final.rds"))
 ```
 
 ### Specificity with BAG3
@@ -102,7 +102,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 # ~~~~ Breakdown of Methods ~~~~ {-}
 
 The following sections breakdown the methods used to transform the contents in `Original Data` to those in `Final Results`.
-We start by loading in any required packages for our analysis.
+We start by loading in any required packages for our analysis and setting some global variables.
 
 ```{r}
 library(conflicted)
@@ -121,6 +121,11 @@ library(ibb)
 library(devtools)
 ```
 
+```{r}
+assets_dir <- file.path(getwd(), "..", "assets")
+results_dir <- file.path(getwd(), "..", "results")
+```
+
 # Original Data
 
 This section contains the original data received from the mass spec facility and was mainly processed using Proteome Discoverer from Thermo Fisher.
@@ -128,8 +133,8 @@ Standard cleaning such as removal of keratin and lowly abundant peptides was alr
 The table below is unedited except for minimal formatting outside of R for easier import.
 
 ```{r}
-co_ip_genes <- data.table(read_excel(
-  "../assets/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"))
+co_ip_genes <- data.table(read_excel(file.path(
+  assets_dir, "proteome-discoverer", "Ji_ProteinReport-ProteinReport_17-155-edited.xlsx")))
 
 # This should use eturkesRutils::datatable but the exponential conversion didn't work on this table.
 # So, we recreate it excluding that feature.
@@ -144,9 +149,6 @@ First, we do some very basic modifications that improve presentation of the tabl
 In best case scenarios, this may be all that is needed.
 
 ```{r}
-co_ip_genes <- data.table(read_excel(
-  "../assets/proteome-discoverer/Ji_ProteinReport-ProteinReport_17-155-edited.xlsx"))
-
 # Rename and reduce columns.
 cols <- c("Genes", "Abundance Ratio: log2(scr/sh)", "scrRNA Abundance", "shBAG3 Abundance")
 co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
@@ -250,10 +252,10 @@ Despite heavy debugging, including forking GSimp and dependencies, attempts to r
 Debug reports were sent to upstream and we simply show a summary of the debugging session below.
 
 #### Top to bottom debug flow leading to error
-![](../assets/debug/mydata-top-to-bottom-debug.png)
+![mydata-top-to-bottom-debug.png](../assets/debug/mydata-top-to-bottom-debug.png "Top to bottom debug flow leading to error")
 
 #### Our data (left) compared to example data (right) at point of error
-![](../assets/debug/left-mydata-right-untargeted.png)
+![left-mydata-right-untargeted.png](../assets/debug/left-mydata-right-untargeted.png "Our data (left) compared to example data (right) at point of error")
 
 ### QRILC
 
@@ -477,17 +479,19 @@ We first begin by inputing our gene list thus far into WDD.
 As WDD does not take into account order, the sort scheme does not matter.
 As seen in the figure below, WDD only found literature relating BAG3 to a handful of our Co-IP genes, even with the most minimal threshold parameters.
 
-![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png)
+![network-bag3-co-ip-direct-to-bag3.png](../assets/watson/network-bag3-co-ip-direct-to-bag3.png "Only Direct to BAG3")
 
 This network expands greatly if we also include intermediate connections to BAG3, revealing genes that have not been reported to interact directly with BAG3 but do interact with one or more or the genes above.
 
-![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png)
+![network-bag3-co-ip-indirect-to-bag3.png](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png "Including Indirect to BAG3")
 
 By importing the graph data into R, we can see which of these intermediate genes, if any, are also in our Co-IP list.
 
 ```{r}
-watson_direct_graph <- fread("../assets/watson/relationshipgraph-bag3-co-ip-direct-to-bag3.csv")
-watson_indirect_graph <- fread("../assets/watson/relationshipgraph-bag3-co-ip-indirect-to-bag3.csv")
+watson_direct_graph <- fread(file.path(
+  assets_dir, "watson", "relationshipgraph-bag3-co-ip-direct-to-bag3.csv"))
+watson_indirect_graph <- fread(file.path(
+  assets_dir, "watson", "relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"))
 watson_direct_graph <- watson_direct_graph[ , c(
   "Source name", "Target name", "Confidence"), with = FALSE]
 watson_indirect_graph <- watson_indirect_graph[ , c("Source name", "Target name"), with = FALSE]
@@ -550,7 +554,10 @@ This concludes the methods used in this analysis.
 Below we simply write the data to disk for exploration in `Final Results` at the top of this report and output the `session_info`.
 
 ```{r}
-saveRDS(co_ip_genes, file = "../results/co_ip_genes_final.rds")
+saveRDS(co_ip_genes, file = file.path(results_dir, "co_ip_genes_final.rds"))
+```
+
+```{r}
 session_info()
 ```
 
