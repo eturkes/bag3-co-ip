@@ -37,7 +37,7 @@ knit:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8.5)
 library(magrittr)
 ```
 
