@@ -76,8 +76,8 @@ Briefly, the original dataset was subject to missing value imputation via a cust
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes_final.rds"))
-cols <- c("Genes", "Specificity: avg(Abun. Ratio, Watson)", "Abundance Ratio: (scr/sh)",
+co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
+cols <- c("Genes", "BAG3 Specificity", "Abundance Ratio",
           "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
 ```
 
@@ -150,7 +150,7 @@ In best case scenarios, this may be all that is needed.
 
 ```{r}
 # Rename and reduce columns.
-cols <- c("Genes", "Abundance Ratio: log2(scr/sh)", "scrRNA Abundance", "shBAG3 Abundance")
+cols <- c("Genes", "Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
 co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
   "Scr Abundances" = cols[3], "SH Abundances" = cols[4]))
@@ -409,9 +409,9 @@ abun_ratio <- data.table(
 abun_ratio <- reshape2::melt(abun_ratio, id.vars = NULL) # Resolve masking conflict.
 
 ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
-  geom_density(alpha = 0.25) + xlab("Abundance Ratio: log2(scr/sh)"))
+  geom_density(alpha = 0.25) + xlab("Abundance Ratio"))
 ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
-  geom_histogram(alpha = 0.25, bins = 10) + xlab("Abundance Ratio: log2(scr/sh)"))
+  geom_histogram(alpha = 0.25, bins = 10) + xlab("Abundance Ratio"))
 ```
 
 As the figures show, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
@@ -419,7 +419,7 @@ Therefore, we use the data table after 10% Min imputation for the following sect
 
 ## Renormalization
 
-For easier analysis and interpretation, we have decided to renormalize the values in the `Abundance Ratio: log2(scr/sh)` column.
+For easier analysis and interpretation, we have decided to renormalize the values in the `Abundance Ratio` column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
 Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
 
@@ -427,7 +427,7 @@ Next, we scale these values to a range of $0-100$ to allow for easier comparison
 co_ip_genes <- co_ip_genes_10min
 scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
 co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
-colnames(co_ip_genes)[2] <- "Abundance Ratio: (scr/sh)"
+colnames(co_ip_genes)[2] <- "Abundance Ratio"
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -524,7 +524,7 @@ for (gene in 1:nrow(watson_direct_graph)) {
     if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
       co_ip_genes[row, 3] <- watson_direct_graph[gene, 3]}}}
 co_ip_genes <- co_ip_genes[order(
-  -co_ip_genes$`Watson Confidence`, -co_ip_genes$`Abundance Ratio: (scr/sh)`), ]
+  -co_ip_genes$`Watson Confidence`, -co_ip_genes$`Abundance Ratio`), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(c(2, 3)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -536,14 +536,14 @@ We choose to do this because any appearance of gene in Watson should potentially
 ```{r}
 # Initialize data table.
 tmp <- co_ip_genes[ , 1]
-tmp$`Specificity: avg(Abun. Ratio, Watson)` <- co_ip_genes$`Abundance Ratio: (scr/sh)`
+tmp$`BAG3 Specificity` <- co_ip_genes$`Abundance Ratio`
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
 
 for (row in 1:nrow(co_ip_genes)) {
   if (co_ip_genes[row, 4] > co_ip_genes[row, 3]) {
     co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 3]) / 2 )}}
 co_ip_genes <- co_ip_genes[order(
-  -co_ip_genes$`Specificity: avg(Abun. Ratio, Watson)`, co_ip_genes[[cols[4]]]), ]
+  -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(c(2, 3, 4)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -554,7 +554,7 @@ This concludes the methods used in this analysis.
 Below we simply write the data to disk for exploration in `Final Results` at the top of this report and output the `session_info`.
 
 ```{r}
-saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes_final.rds"))
+saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes.rds"))
 ```
 
 ```{r}
