@@ -76,7 +76,7 @@ Briefly, the original dataset was subject to missing value imputation via a cust
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "co_ip_genes_final.rds"))
+co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes_final.rds"))
 cols <- c("Genes", "Specificity: avg(Abun. Ratio, Watson)", "Abundance Ratio: (scr/sh)",
           "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
 ```
@@ -554,7 +554,7 @@ This concludes the methods used in this analysis.
 Below we simply write the data to disk for exploration in `Final Results` at the top of this report and output the `session_info`.
 
 ```{r}
-saveRDS(co_ip_genes, file = file.path(results_dir, "co_ip_genes_final.rds"))
+saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes_final.rds"))
 ```
 
 ```{r}
