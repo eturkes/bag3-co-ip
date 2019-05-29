@@ -57,7 +57,7 @@ div.main-container {max-width: none; width: 100%;}
 
 The background for this data is as follows:
 
-- Co-IP MS (co-immunoprecipitation mass spectrometry) using BAG3 as bait.
+- Co-IP MS (co-immunoprecipitation mass spectrometry) using [BAG3 (BCL2 Associated Athanogene 3)](https://www.genecards.org/cgi-bin/carddisp.pl?gene=BAG3) as bait.
 - scrRNA control and shBAG3 to knockdown BAG3 for assessing BAG3 specific interactions.
 - Approximately 90% efficient knockdown.
 - Single sample ($n = 1$) of mature rat primary cortical neurons (DIV 24).
@@ -67,13 +67,15 @@ The source code and instructions for rerunning the analysis can be found at [git
 
 # Final Results
 
-**Read just this section for the final results of the analysis and a summary of the methods.**
+**Read just this section for the final results of the analysis and a brief summary of the methods.**
 
 ## Cleaned Dataset {.tabset}
 
-The following is the final Co-IP MS dataset after cleaning as described in this report's method section.
+The final Co-IP MS dataset after cleaning as described in the report’s method section.
 Briefly, the original dataset was subject to missing value imputation via a custom method, renormalized, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
+Additional validation was performed using Watson for Drug Discovery.
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
+Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
 
 ```{r, include = TRUE, echo = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
@@ -101,7 +103,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 
 # ~~~~ Breakdown of Methods ~~~~ {-}
 
-The following sections breakdown the methods used to transform the contents in `Original Data` to those in `Final Results`.
+The following top-level sections breakdown the methods used to perform the analysis.
 We start by loading in any required packages for our analysis and setting some global variables.
 
 ```{r}
@@ -157,7 +159,7 @@ co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
 co_ip_genes <- co_ip_genes[ , cols, with = FALSE]
 co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sorting easier.
 
-# Extract gene names from the "Genes" column, removing entries that lack a name.
+# Extract gene names from the Genes column, removing entries that lack a name.
 # The column of genes are then fed into IBM Watson and converted into Watson entities.
 # They are then replaced with the Watson entities to facilitate easy comparison.
 # This is done manually, as there is currently no Watson for Drug Discovery API.
@@ -196,7 +198,7 @@ eturkesRutils::datatable(co_ip_genes_abun) %>% # From my own package, provides c
 
 The data wrangling thus far reveals several issues that we will attempt to tackle:
 
-- Missing values in the `shBAG3 Abundance` column, which make true ratio calculations impossible.
+- Missing values in the shBAG3 Abundance column, which make true ratio calculations impossible.
 - $log2$ normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
 - Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
@@ -251,10 +253,10 @@ co_ip_genes_tmp <- co_ip_genes[order(co_ip_genes[[cols[1]]])]
 Despite heavy debugging, including forking GSimp and dependencies, attempts to run GSimp on our data was unsuccessful while example data completed with success.
 Debug reports were sent to upstream and we simply show a summary of the debugging session below.
 
-#### Top to bottom debug flow leading to error
+**Top to bottom debug flow leading to error**
 ![](../assets/debug/mydata-top-to-bottom-debug.png "Top to bottom debug flow leading to error")
 
-#### Our data (left) compared to example data (right) at point of error
+**Our data (left) compared to example data (right) at point of error**
 ![](../assets/debug/left-mydata-right-untargeted.png "Our data (left) compared to example data (right) at point of error")
 
 ### QRILC
@@ -274,7 +276,7 @@ co_ip_genes_qrilc <- co_ip_genes_tmp
 # Recalculate abundance ratio.
 co_ip_genes_qrilc[[cols[2]]] <- log2(co_ip_genes_qrilc[[cols[3]]] / co_ip_genes_qrilc[[cols[4]]])
 
-# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+# Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_qrilc <- co_ip_genes_qrilc[order(
   -co_ip_genes_qrilc[[cols[2]]], co_ip_genes_qrilc[[cols[4]]]), ]
 
@@ -302,7 +304,7 @@ co_ip_genes_hm <- co_ip_genes_tmp
 # Recalculate abundance ratio.
 co_ip_genes_hm[[cols[2]]] <- log2(co_ip_genes_hm[[cols[3]]] / co_ip_genes_hm[[cols[4]]])
 
-# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+# Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_hm <- co_ip_genes_hm[order(-co_ip_genes_hm[[cols[2]]], co_ip_genes_hm[[cols[4]]]), ]
 
 eturkesRutils::datatable(co_ip_genes_hm) %>% # From my own package, provides custom formatting.
@@ -329,7 +331,7 @@ co_ip_genes_10min <- co_ip_genes_tmp
 # Recalculate abundance ratio.
 co_ip_genes_10min[[cols[2]]] <- log2(co_ip_genes_10min[[cols[3]]] / co_ip_genes_10min[[cols[4]]])
 
-# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+# Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_10min <- co_ip_genes_10min[order(
   -co_ip_genes_10min[[cols[2]]], co_ip_genes_10min[[cols[4]]]), ]
 
@@ -358,7 +360,7 @@ co_ip_genes_cond_min <- co_ip_genes_tmp
 co_ip_genes_cond_min[[cols[2]]] <- log2(
   co_ip_genes_cond_min[[cols[3]]] / co_ip_genes_cond_min[[cols[4]]])
 
-# Use sort from "Specificity with BAG3" as it best displays the effects of imputation.
+# Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_cond_min <- co_ip_genes_cond_min[order(
   -co_ip_genes_cond_min[[cols[2]]], co_ip_genes_cond_min[[cols[4]]]), ]
 
@@ -368,7 +370,9 @@ eturkesRutils::datatable(co_ip_genes_cond_min) %>% # From my own package, provid
 
 ### Benchmarks {.active}
 
-In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the `Specificity with BAG3` sort scheme.
+#### Ranking Table
+
+In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the Specificity with BAG3 sort scheme.
 Note GSimp is missing because it failed to run (see its tab for debug details).
 The ranking ranges from $1-95$.
 
@@ -399,6 +403,8 @@ eturkesRutils::datatable(mvi_benchmark) %>% # From my own package, provides cust
 It appears that QRILC and HM produce similar results, imputing values close to the scrRNA values, effectively resulting in a low fold change and rank towards the tail end of the range.
 On the otherhand, 10% Min centers the rankings and Within Condition Min produces rankings near the head of the range, similar to the original rankings.
 
+#### Effect On Normality
+
 To further explore these distributions, we can assess the normality of the abundance ratio calculation after imputation.
 
 ```{r}
@@ -419,7 +425,7 @@ Therefore, we use the data table after 10% Min imputation for the following sect
 
 ## Renormalization
 
-For easier analysis and interpretation, we have decided to renormalize the values in the `Abundance Ratio` column.
+For easier analysis and interpretation, we have decided to renormalize the values in the Abundance Ratio column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
 Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
 
@@ -456,6 +462,7 @@ co_ip_genes <- co_ip_genes[order(-co_ip_genes$`p-value`)]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
+
 Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries in the above list, and sort from low to high p-values.
 
 ```{r}
@@ -474,18 +481,19 @@ Here we explore additional measures to validate the data without targeting speci
 IBM's [Watson for Drug Discovery](https://www.ibm.com/products/watson-drug-discovery) (WDD) is a text-mining platform that has built a massive corpus of scientific insights drawn from publications and other data forms.
 By inputting our data into the platform, we can use various measures from WDD to infer the likelihood that the contents and order are true.
 Note that due to the lack of a WDD API, this section was done manually rather than programmatically.
+WDD also does not take into account order, so the sort scheme does not matter.
 
-We first begin by inputing our gene list thus far into WDD.
-As WDD does not take into account order, the sort scheme does not matter.
+### Direct Connections to BAG3
+
 As seen in the figure below, WDD only found literature relating BAG3 to a handful of our Co-IP genes, even with the most minimal threshold parameters.
 
-#### WDD: Direct to BAG3
-![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png "WDD: Direct to BAG3")
+![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png "Direct Connections to BAG3")
+
+### Including Indirect Connections to BAG3
 
 This network expands greatly if we also include intermediate connections to BAG3, revealing genes that have not been reported to interact directly with BAG3 but do interact with one or more or the genes above.
 
-#### WDD: Including Indirect to BAG3
-![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png "WDD: Including Indirect to BAG3")
+![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png "Including Indirect Connections to BAG3")
 
 By importing the graph data into R, we can see which of these intermediate genes, if any, are also in our Co-IP list.
 
@@ -509,7 +517,10 @@ cat(paste("The genes in common are:", common_genes, " "))
 ```
 
 There are no common intermediate genes, so we will disregard them for the rest of the analysis.
-Though it is limited to only our six direct genes, WDD provides a "confidence_score" that assesses the quality of evidence for an association.
+
+### Adding Confidence Score to Dataset
+
+Though it is limited to only our six direct genes, WDD provides a `confidence_score` that assesses the quality of evidence for an association.
 It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
 Also, because WDD differentiates up and downstream relationships, some genes have multiple confidence scores.
 While it would be ideal to combine confidence scores, due to the complexity of the confidence algorithm, we simply opt to choose the max value of each relationship.
@@ -550,10 +561,10 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   formatRound(c(2, 3, 4)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-# Conclusion
+# References
 
-This concludes the methods used in this analysis.
-Below we simply write the data to disk for exploration in `Final Results` at the top of this report and output the `session_info`.
+This is the concluding section of the document.
+Here we write relevant results to disk, output the `session_info`, and create a bibliography for works cited.
 
 ```{r}
 saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes.rds"))
@@ -562,5 +573,3 @@ saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes.rds"))
 ```{r}
 session_info()
 ```
-
-# References
