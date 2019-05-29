@@ -106,6 +106,7 @@ We start by loading in any required packages for our analysis and setting some g
 
 ```{r}
 library(conflicted)
+library(devtools)
 library(data.table)
 library(readxl)
 library(DT)
@@ -118,7 +119,6 @@ library(tibble)
 library(reshape2)
 library(plotly)
 library(ibb)
-library(devtools)
 ```
 
 ```{r}
