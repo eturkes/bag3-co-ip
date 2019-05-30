@@ -254,10 +254,10 @@ Despite heavy debugging, including forking GSimp and dependencies, attempts to r
 Debug reports were sent to upstream and we simply show a summary of the debugging session below.
 
 **Top to bottom debug flow leading to error**
-![](../assets/debug/mydata-top-to-bottom-debug.png "Top to bottom debug flow leading to error")
+![](../assets/debug/mydata-top-to-bottom-debug.png)
 
 **Our data (left) compared to example data (right) at point of error**
-![](../assets/debug/left-mydata-right-untargeted.png "Our data (left) compared to example data (right) at point of error")
+![](../assets/debug/left-mydata-right-untargeted.png)
 
 ### QRILC
 
@@ -487,13 +487,13 @@ WDD also does not take into account order, so the sort scheme does not matter.
 
 As seen in the figure below, WDD only found literature relating BAG3 to a handful of our Co-IP genes, even with the most minimal threshold parameters.
 
-![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png "Direct Connections to BAG3")
+![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png)
 
 ### Including Indirect Connections to BAG3
 
 This network expands greatly if we also include intermediate connections to BAG3, revealing genes that have not been reported to interact directly with BAG3 but do interact with one or more or the genes above.
 
-![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png "Including Indirect Connections to BAG3")
+![](../assets/watson/network-bag3-co-ip-indirect-to-bag3.png)
 
 By importing the graph data into R, we can see which of these intermediate genes, if any, are also in our Co-IP list.
 
