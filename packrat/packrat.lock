@@ -1,7 +1,11 @@
 PackratFormat: 1.4
 PackratVersion: 0.5.0
 RVersion: 3.6.0
-Repos: CRAN=https://cran.rstudio.com/
+Repos: BioCsoft=https://bioconductor.org/packages/3.9/bioc,
+    BioCann=https://bioconductor.org/packages/3.9/data/annotation,
+    BioCexp=https://bioconductor.org/packages/3.9/data/experiment,
+    BioCworkflows=https://bioconductor.org/packages/3.9/workflows,
+    CRAN=https://cran.rstudio.com
 
 Package: BH
 Source: CRAN
@@ -166,11 +170,6 @@ GithubRepo: eturkesRutils
 GithubUsername: eturkes
 GithubRef: master
 GithubSha1: 7ebf1eaeb2c8266059efca4fe3acf952ef89a3f9
-RemoteHost: api.github.com
-RemoteRepo: eturkesRutils
-RemoteUsername: eturkes
-RemoteRef: master
-RemoteSha: 7ebf1eaeb2c8266059efca4fe3acf952ef89a3f9
 
 Package: evaluate
 Source: CRAN
@@ -266,7 +265,7 @@ Package: ibb
 Source: source
 Version: 13.06
 Hash: d9fe9d21151198cc120ad5cd2e627ce1
-SourcePath: assets/R-packages//ibb
+SourcePath: assets/R-packages/ibb
 
 Package: impute
 Source: Bioconductor
@@ -282,11 +281,6 @@ GithubRepo: imputeLCMD-eturkes
 GithubUsername: eturkes
 GithubRef: master
 GithubSha1: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
-RemoteHost: api.github.com
-RemoteRepo: imputeLCMD-eturkes
-RemoteUsername: eturkes
-RemoteRef: master
-RemoteSha: 7e9b4bdf3b5f278b95b650a5f364874cd7bd01d9
 
 Package: ini
 Source: CRAN
