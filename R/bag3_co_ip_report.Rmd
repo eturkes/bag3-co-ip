@@ -164,8 +164,8 @@ co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sor
 # They are then replaced with the Watson entities to facilitate easy comparison.
 # This is done manually, as there is currently no Watson for Drug Discovery API.
 co_ip_genes[[cols[1]]] <- str_extract(co_ip_genes[[cols[1]]], "(?<=GN=).*(?= PE=)")
-co_ip_genes <- co_ip_genes[rowSums(is.na(co_ip_genes[ , 1]))!=1, ]
-watson_genes <- fread("../assets/watson/EntitySet-bag3-co-ip.csv")
+co_ip_genes <- co_ip_genes[rowSums(is.na(co_ip_genes[ , 1])) != 1, ]
+watson_genes <- fread(file.path(assets_dir, "watson", "EntitySet-bag3-co-ip.csv"))
 co_ip_genes[[cols[1]]] <- watson_genes$`Entity name`
 
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
