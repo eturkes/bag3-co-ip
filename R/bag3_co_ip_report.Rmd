@@ -79,7 +79,7 @@ Ideally, the two schemes would be combined to show which proteins interacted mos
 
 ```{r, include = TRUE, echo = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
-cols <- c("Genes", "BAG3 Specificity", "Abundance Ratio",
+cols <- c("Gene", "BAG3 Specificity", "Abundance Ratio",
           "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
 ```
 
@@ -152,14 +152,14 @@ In best case scenarios, this may be all that is needed.
 
 ```{r}
 # Rename and reduce columns.
-cols <- c("Genes", "Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
+cols <- c("Gene", "Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
 co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
   "Scr Abundances" = cols[3], "SH Abundances" = cols[4]))
 co_ip_genes <- co_ip_genes[ , cols, with = FALSE]
 co_ip_genes[is.na(co_ip_genes)] <- 0 # We replace NA with 0s for now to make sorting easier.
 
-# Extract gene names from the Genes column, removing entries that lack a name.
+# Extract gene names from the Gene column, removing entries that lack a name.
 # The column of genes are then fed into IBM Watson and converted into Watson entities.
 # They are then replaced with the Watson entities to facilitate easy comparison.
 # This is done manually, as there is currently no Watson for Drug Discovery API.
@@ -268,7 +268,7 @@ co_ip_genes_qrilc_tmp <- impute.QRILC(co_ip_genes_mvi) %>% extract2(1)
 co_ip_genes_qrilc_tmp <- rownames_to_column(co_ip_genes_qrilc_tmp)
 co_ip_genes_qrilc <- data.frame(t(co_ip_genes_qrilc_tmp[-1]))
 colnames(co_ip_genes_qrilc) <- co_ip_genes_qrilc_tmp[ , 1]
-co_ip_genes_qrilc <- rownames_to_column(co_ip_genes_qrilc, var = "Genes")
+co_ip_genes_qrilc <- rownames_to_column(co_ip_genes_qrilc, var = "Gene")
 setDT(co_ip_genes_qrilc)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_qrilc[[cols[4]]]
 co_ip_genes_qrilc <- co_ip_genes_tmp
@@ -296,7 +296,7 @@ co_ip_genes_hm_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
 co_ip_genes_hm_tmp <- rownames_to_column(co_ip_genes_hm_tmp)
 co_ip_genes_hm <- data.frame(t(co_ip_genes_hm_tmp[-1]))
 colnames(co_ip_genes_hm) <- co_ip_genes_hm_tmp[ , 1]
-co_ip_genes_hm <- rownames_to_column(co_ip_genes_hm, var = "Genes")
+co_ip_genes_hm <- rownames_to_column(co_ip_genes_hm, var = "Gene")
 setDT(co_ip_genes_hm)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_hm[[cols[4]]]
 co_ip_genes_hm <- co_ip_genes_tmp
@@ -323,7 +323,7 @@ co_ip_genes_10min_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
 co_ip_genes_10min_tmp <- rownames_to_column(co_ip_genes_10min_tmp)
 co_ip_genes_10min <- data.frame(t(co_ip_genes_10min_tmp[-1]))
 colnames(co_ip_genes_10min) <- co_ip_genes_10min_tmp[ , 1]
-co_ip_genes_10min <- rownames_to_column(co_ip_genes_10min, var = "Genes")
+co_ip_genes_10min <- rownames_to_column(co_ip_genes_10min, var = "Gene")
 setDT(co_ip_genes_10min)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_10min[[cols[4]]]
 co_ip_genes_10min <- co_ip_genes_tmp
@@ -351,7 +351,7 @@ co_ip_genes_cond_min_tmp[] <- lapply(co_ip_genes_mvi, function(x) {
 co_ip_genes_cond_min_tmp <- rownames_to_column(co_ip_genes_cond_min_tmp)
 co_ip_genes_cond_min <- data.frame(t(co_ip_genes_cond_min_tmp[-1]))
 colnames(co_ip_genes_cond_min) <- co_ip_genes_cond_min_tmp[ , 1]
-co_ip_genes_cond_min <- rownames_to_column(co_ip_genes_cond_min, var = "Genes")
+co_ip_genes_cond_min <- rownames_to_column(co_ip_genes_cond_min, var = "Gene")
 setDT(co_ip_genes_cond_min)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_cond_min[[cols[4]]]
 co_ip_genes_cond_min <- co_ip_genes_tmp
@@ -384,7 +384,7 @@ for (row in 1:nrow(co_ip_genes_spec)) {
     mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])}}
 mvi_dts <- list(
   co_ip_genes_spec, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min)
-mvi_benchmark <- data.table("Missing Value Genes" = mvi_genes, "Original Rank" = 0, "QRILC Rank" = 0,
+mvi_benchmark <- data.table("Missing Value Gene" = mvi_genes, "Original Rank" = 0, "QRILC Rank" = 0,
                             "HM Rank" = 0, "10% Min Rank" = 0, "Within Condition Min Rank" = 0)
 
 # Add values from data table list.
@@ -397,7 +397,7 @@ for (set in mvi_dts) {
         mvi_benchmark[benchmark_row, col_count] <- dts_row}}}}
 
 eturkesRutils::datatable(mvi_benchmark) %>% # From my own package, provides custom formatting.
-  formatStyle("Missing Value Genes", `text-align` = "center")
+  formatStyle("Missing Value Gene", `text-align` = "center")
 ```
 
 It appears that QRILC and HM produce similar results, imputing values close to the scrRNA values, effectively resulting in a low fold change and rank towards the tail end of the range.
