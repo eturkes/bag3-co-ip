@@ -151,7 +151,7 @@ First, we do some very basic modifications that improve presentation of the tabl
 In best case scenarios, this may be all that is needed.
 
 ```{r}
-# Rename and reduce columns.
+# Rename and subset columns.
 cols <- c("Gene", "Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
 co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
