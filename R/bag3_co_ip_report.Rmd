@@ -101,7 +101,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
-# ~~~~ Breakdown of Methods ~~~~ {-}
+# ~~~ Breakdown of Methods ~~~ {-}
 
 The following top-level sections breakdown the methods used to perform the analysis.
 We start by setting some global variables and loading in any required packages.
