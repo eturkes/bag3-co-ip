@@ -194,7 +194,7 @@ eturkesRutils::datatable(co_ip_genes_abun) %>% # From my own package, provides c
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-# Addressing Issues
+# Overview of Issues
 
 The data wrangling thus far reveals several issues that we will attempt to tackle:
 
@@ -202,7 +202,7 @@ The data wrangling thus far reveals several issues that we will attempt to tackl
 - $log2$ normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
 - Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
 
-## Missing Value Imputation {.tabset}
+# Missing Value Imputation {.tabset}
 
 There are a handful of methods for addressing missing values in metabolomics data, which were reviewed and compared in @wei_missing_2018.
 The appropriate method is dependent on the type of missing value.
@@ -248,7 +248,7 @@ co_ip_genes_mvi <- data.frame(co_ip_genes_mvi[ , -1], row.names = co_ip_genes_mv
 co_ip_genes_tmp <- co_ip_genes[order(co_ip_genes[[cols[1]]])]
 ```
 
-### GSimp
+## GSimp
 
 Despite heavy debugging, including forking GSimp and dependencies, attempts to run GSimp on our data was unsuccessful while example data completed with success.
 Debug reports were sent to upstream and we simply show a summary of the debugging session below.
@@ -259,7 +259,7 @@ Debug reports were sent to upstream and we simply show a summary of the debuggin
 **Our data (left) compared to example data (right) at point of error**
 ![](../assets/debug/left-mydata-right-untargeted.png)
 
-### QRILC
+## QRILC
 
 ```{r}
 co_ip_genes_qrilc_tmp <- impute.QRILC(co_ip_genes_mvi) %>% extract2(1)
@@ -284,7 +284,7 @@ eturkesRutils::datatable(co_ip_genes_qrilc) %>% # From my own package, provides 
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-### HM
+## HM
 
 ```{r}
 co_ip_genes_hm_tmp <- co_ip_genes_mvi
@@ -311,7 +311,7 @@ eturkesRutils::datatable(co_ip_genes_hm) %>% # From my own package, provides cus
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-### 10% Min
+## 10% Min
 
 ```{r}
 co_ip_genes_10min_tmp <- co_ip_genes_mvi
@@ -339,7 +339,7 @@ eturkesRutils::datatable(co_ip_genes_10min) %>% # From my own package, provides 
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-### Within Condition Min
+## Within Condition Min
 
 ```{r}
 co_ip_genes_cond_min_tmp <- co_ip_genes_mvi
@@ -368,9 +368,9 @@ eturkesRutils::datatable(co_ip_genes_cond_min) %>% # From my own package, provid
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-### Benchmarks {.active}
+## Benchmarks {.active}
 
-#### Ranking Table
+### Ranking Table
 
 In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the Specificity with BAG3 sort scheme.
 Note GSimp is missing because it failed to run (see its tab for debug details).
@@ -403,7 +403,7 @@ eturkesRutils::datatable(mvi_benchmark) %>% # From my own package, provides cust
 It appears that QRILC and HM produce similar results, imputing values close to the scrRNA values, effectively resulting in a low fold change and rank towards the tail end of the range.
 On the otherhand, 10% Min centers the rankings and Within Condition Min produces rankings near the head of the range, similar to the original rankings.
 
-#### Effect On Normality
+### Effect On Normality
 
 To further explore these distributions, we can assess the normality of the abundance ratio calculation after imputation.
 
@@ -423,7 +423,7 @@ ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
 As the figures show, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
 Therefore, we use the data table after 10% Min imputation for the following sections.
 
-## Renormalization
+# Renormalization
 
 For easier analysis and interpretation, we have decided to renormalize the values in the Abundance Ratio column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
@@ -438,7 +438,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-## Hypothesis Testing
+# Hypothesis Testing
 
 Due to the $n = 1$ sample size, the most standard hypothesis tests for mass spec proteomics like ANOVA are unavailable.
 However, in @bantscheff_quantitative_2007, the following tests for experiments without replicates were reviewed and found to be suitable when a large number of peptide spectra are present:
@@ -477,24 +477,24 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-# Additional Validation
-
-Here we explore additional measures to validate the data without targeting specific issues.
-
-## Watson for Drug Discovery
+# Watson for Drug Discovery
 
 IBM's [Watson for Drug Discovery](https://www.ibm.com/products/watson-drug-discovery) (WDD) is a text-mining platform that has built a massive corpus of scientific insights drawn from publications and other data forms.
 By inputting our data into the platform, we can use various measures from WDD to infer the likelihood that the contents and order are true.
 Note that due to the lack of a WDD API, this section was done manually rather than programmatically.
 WDD also does not take into account order, so the sort scheme does not matter.
 
+## Network Graphs
+
+We first use WDD's Explore a Network feature gain insight into the relationship of BAG3 entities in the literature.
+
 ### Direct Connections to BAG3
 
-As seen in the figure below, WDD only found literature relating BAG3 to a handful of our Co-IP genes, even with the most minimal threshold parameters.
+When exploring the Co-IP list thus far, WDD only found literature relating BAG3 to a handful of the genes, even with the most minimal threshold parameters.
 
 ![](../assets/watson/network-bag3-co-ip-direct-to-bag3.png)
 
-### Including Indirect Connections to BAG3
+### Indirect Connections to BAG3
 
 This network expands greatly if we also include intermediate connections to BAG3, revealing genes that have not been reported to interact directly with BAG3 but do interact with one or more or the genes above.
 
@@ -523,7 +523,7 @@ cat(paste("The genes in common are:", common_genes, " "))
 
 There are no common intermediate genes, so we will disregard them for the rest of the analysis.
 
-### Adding Confidence Score to Dataset
+### Add Confidence Scores to Dataset
 
 Though it is limited to only our six direct genes, WDD provides a `confidence_score` that assesses the quality of evidence for an association.
 It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
@@ -566,7 +566,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   formatRound(c(2, 3, 4)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
-### Predictive Analytics
+## Predictive Analytics
 
 WDD has a feature that can rank candidate entities against known ones by comparing similarity between both actual chemical structures and similarity in text.
 As our known set, we use the genes found in the "Direct Connections to BAG3" section namely:
@@ -591,15 +591,15 @@ Validation entities = HSPA8, VIM # Improves the ranking of candidate entities.
 
 The subsections below describe the results obtained.
 
-#### Similarity Tree
+### Similarity Tree
 
 ![](../assets/watson/predictive-tree.png)
 
-#### Distance Network
+### Distance Network
 
 ![](../assets/watson/predictive-distance.png)
 
-#### Ranking Table
+### Ranking Table
 
 ```{r}
 predictive <- fread(file.path(assets_dir, "watson", "predictive-neighborhoodgraph.csv"))
