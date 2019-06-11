@@ -572,12 +572,13 @@ WDD has a feature that can rank candidate entities against known ones by compari
 As our known set, we use the genes found in the "Direct Connections to BAG3" section namely:
 
 ```
-BAG3
-HSPA8
-HSPB8
+# In order of Similarity score.
 MVP
-CAPZB
+HSPA8
+BAG3
+HSPB8
 VIM
+CAPZB
 ```
 
 Where the candidate genes are the 87 other ones in the Co-IP list.
@@ -588,13 +589,28 @@ Similarity type = Combined # Both Text and Chemical.
 Validation entities = HSPA8, VIM # Improves the ranking of candidate entities.
 ```
 
-Two kinds of figures are obtained, a similarity tree:
+The subsections below describe the results obtained.
+
+#### Similarity Tree
 
 ![](../assets/watson/predictive-tree.png)
 
-And a distance network:
+#### Distance Network
 
 ![](../assets/watson/predictive-distance.png)
+
+#### Ranking Table
+
+```{r}
+predictive <- fread(file.path(assets_dir, "watson", "predictive-neighborhoodgraph.csv"))
+predictive_cols <- c("Gene", "Set", "Similarity")
+predictive <- plyr::rename(predictive, c( # Resolve masking conflict.
+  "Display name" = predictive_cols[1], "Similarity score" = predictive_cols[3]))
+predictive <- predictive[ , predictive_cols, with = FALSE]
+predictive <- predictive[-nrow(predictive), ] # Remove empty last row.
+datatable(predictive) %>%
+  formatStyle(cols[1], `text-align` = "center")
+```
 
 # References
 
