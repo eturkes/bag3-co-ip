@@ -566,6 +566,36 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
   formatRound(c(2, 3, 4)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
+### Predictive Analytics
+
+WDD has a feature that can rank candidate entities against known ones by comparing similarity between both actual chemical structures and similarity in text.
+As our known set, we use the genes found in the "Direct Connections to BAG3" section namely:
+
+```
+BAG3
+HSPA8
+HSPB8
+MVP
+CAPZB
+VIM
+```
+
+Where the candidate genes are the 87 other ones in the Co-IP list.
+We also set the following parameters:
+
+```
+Similarity type = Combined # Both Text and Chemical.
+Validation entities = HSPA8, VIM # Improves the ranking of candidate entities.
+```
+
+Two kinds of figures are obtained, a similarity tree:
+
+![](../assets/watson/predictive-tree.png)
+
+And a distance network:
+
+![](../assets/watson/predictive-distance.png)
+
 # References
 
 This is the concluding section of the document.
