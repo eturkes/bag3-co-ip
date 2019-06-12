@@ -424,7 +424,7 @@ ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
 As the figures show, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
 Therefore, we use the data table after 10% Min imputation for the following sections.
 
-# Renormalization
+# Normalization
 
 For easier analysis and interpretation, we have decided to renormalize the values in the Abundance Ratio column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
