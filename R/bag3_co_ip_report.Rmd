@@ -79,8 +79,9 @@ Ideally, the two schemes would be combined to show which proteins interacted mos
 
 ```{r, include = TRUE, echo = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
-cols <- c("Gene", "BAG3 Specificity", "Abundance Ratio",
-          "Watson Confidence", "scrRNA Abundance", "shBAG3 Abundance")
+cols <- c(
+  "Gene", "BAG3 Specificity", "Abundance Ratio", "Watson Confidence",
+  "Watson Similarity", "scrRNA Abundance", "shBAG3 Abundance")
 ```
 
 ### Specificity with BAG3
@@ -89,7 +90,7 @@ cols <- c("Gene", "BAG3 Specificity", "Abundance Ratio",
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[6]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
-  DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
@@ -98,7 +99,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[5]]], -co_ip_genes[[cols[6]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
-  DT::formatRound(c(2, 3, 4)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
 ```
 
 # ~~~ Breakdown of Methods ~~~ {-}
@@ -454,7 +455,6 @@ Below, we apply the beta-binomial model to our dataset using the R package devel
 The table is sorted from highest p values to low, to show what might be filtered out when we apply a cutoff.
 
 ```{r, cache = TRUE}
-# This chunk was run with "cache = TRUE".
 ibb_out <- ibb.test(
   co_ip_genes[ , 3:4], colSums(co_ip_genes[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1)
 saveRDS(ibb_out, file = file.path(results_dir, "data", "ibb_out.rds"))
@@ -559,7 +559,7 @@ co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
 
 for (row in 1:nrow(co_ip_genes)) {
   if (co_ip_genes[row, 4] > co_ip_genes[row, 3]) {
-    co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 3]) / 2 )}}
+    co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 2]) / 2 )}}
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -610,6 +610,36 @@ predictive <- predictive[ , predictive_cols, with = FALSE]
 predictive <- predictive[-nrow(predictive), ] # Remove empty last row.
 datatable(predictive) %>%
   formatStyle(cols[1], `text-align` = "center")
+```
+
+### Add Similarity Scores to Dataset
+
+We normalize the scores to percentages for easy integration with our other scores and then use the same averaging method as when adding the confidence scores.
+
+```{r, cache = TRUE}
+# Initialize data table.
+tmp <- co_ip_genes[ , 1:4]
+tmp$`Watson Similarity` <- 0
+co_ip_genes <- cbind(tmp, co_ip_genes[ , 5:7])
+
+# Add the scores.
+for (gene in 1:nrow(predictive)) {
+  for (row in 1:nrow(co_ip_genes)) {
+    if (co_ip_genes[row, 1] == predictive[gene, 1]) {
+      co_ip_genes[row, 5] <- predictive[gene, 3]}}}
+
+# Normalize the scores.
+co_ip_genes$`Watson Similarity` <- co_ip_genes$`Watson Similarity` * 100
+
+# Integrate scores into the BAG3 Specificity column.
+for (row in 1:nrow(co_ip_genes)) {
+  if (co_ip_genes[row, 5] > co_ip_genes[row, 2]) {
+    co_ip_genes[row, 2] <- ((co_ip_genes[row, 5] + co_ip_genes[row, 2]) / 2 )}}
+
+co_ip_genes <- co_ip_genes[order(
+  -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
+eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+  formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
 # References
