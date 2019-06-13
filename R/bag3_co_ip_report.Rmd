@@ -72,22 +72,22 @@ The source code and instructions for rerunning the analysis can be found at [git
 ## Cleaned Dataset {.tabset}
 
 The final Co-IP MS dataset after cleaning as described in the report’s method section.
-Briefly, the original dataset was subject to missing value imputation via a custom method, renormalized, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
-Additional validation was performed using Watson for Drug Discovery.
+Briefly, the original dataset was subject to missing value imputation via a custom method, the abundance ratio was scaled to a range of $0-100$, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
+Additional validation was performed using Watson for Drug Discovery, which looks for literature and chemical relationships among entities.
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
 
 ```{r, include = TRUE, echo = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
 cols <- c(
-  "Gene", "BAG3 Specificity", "Abundance Ratio", "Watson Confidence",
-  "Watson Similarity", "scrRNA Abundance", "shBAG3 Abundance")
+  "Gene", "BAG3 Specificity", "Scaled Abundance Ratio", "Watson Specificity Confidence",
+  "Watson BAG3 Similarity", "scrRNA Abundance", "shBAG3 Abundance")
 ```
 
 ### Specificity with BAG3
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[6]]]), ]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
@@ -96,7 +96,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 ### Abundance of Protein
 
 ```{r, include = TRUE, echo = FALSE}
-co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[5]]], -co_ip_genes[[cols[6]]]), ]
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[6]]], -co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
@@ -200,8 +200,9 @@ eturkesRutils::datatable(co_ip_genes_abun) %>% # From my own package, provides c
 The data wrangling thus far reveals several issues that we will attempt to tackle:
 
 - Missing values in the shBAG3 Abundance column, which make true ratio calculations impossible.
-- $log2$ normalized abundance ratios with arbitrary maximum thresholds, which complicate interpretation without added benefit due to the lack of ratios in the negative direction.
-- Lack of hypothesis testing due to the lack of replicates required by Proteome Discoverer.
+- $log2$ normalized abundance ratios, which do not improve normality nor interpretability due to the lack of negative values, which would otherwise benefit from a centering about zero.
+- Arbitrary maximum thresholds in the abundance ratios, which reduce the information available.
+- Lack of hypothesis testing due to the lack of replicates as required by Proteome Discoverer.
 
 # Missing Value Imputation {.tabset}
 
@@ -417,24 +418,23 @@ abun_ratio <- reshape2::melt(abun_ratio, id.vars = NULL) # Resolve masking confl
 
 ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
   geom_density(alpha = 0.25) + xlab("Abundance Ratio"))
-ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
-  geom_histogram(alpha = 0.25, bins = 10) + xlab("Abundance Ratio"))
 ```
 
-As the figures show, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
+As the figure shows, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
 Therefore, we use the data table after 10% Min imputation for the following sections.
 
-# Normalization
+# Scaling and Normalization
 
-For easier analysis and interpretation, we have decided to renormalize the values in the Abundance Ratio column.
+For easier analysis and interpretation, we have decided to scale and normalize the values in the Abundance Ratio column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
-Next, we scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence values.
+Next, we undo the log transformation and scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence and similarity values.
 
 ```{r}
 co_ip_genes <- co_ip_genes_10min
 scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
 co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
-colnames(co_ip_genes)[2] <- "Abundance Ratio"
+cols <- c("Gene", "Scaled Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
+colnames(co_ip_genes)[2] <- cols[2]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -534,7 +534,7 @@ While it would be ideal to combine confidence scores, due to the complexity of t
 # Initialize data table.
 watson_direct_graph <- watson_direct_graph[grep("BAG3", watson_direct_graph$`Source name`), ]
 tmp <- co_ip_genes[ , 1:2]
-tmp$`Watson Confidence` <- 0
+tmp$`Watson Specificity Confidence` <- 0
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 3:5])
 
 for (gene in 1:nrow(watson_direct_graph)) {
@@ -542,7 +542,7 @@ for (gene in 1:nrow(watson_direct_graph)) {
     if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
       co_ip_genes[row, 3] <- watson_direct_graph[gene, 3]}}}
 co_ip_genes <- co_ip_genes[order(
-  -co_ip_genes$`Watson Confidence`, -co_ip_genes$`Abundance Ratio`), ]
+  -co_ip_genes$`Watson Specificity Confidence`, -co_ip_genes$`Scaled Abundance Ratio`), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(c(2, 3)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -554,7 +554,7 @@ We choose to do this because any appearance of gene in Watson should potentially
 ```{r}
 # Initialize data table.
 tmp <- co_ip_genes[ , 1]
-tmp$`BAG3 Specificity` <- co_ip_genes$`Abundance Ratio`
+tmp$`BAG3 Specificity` <- co_ip_genes$`Scaled Abundance Ratio`
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
 
 for (row in 1:nrow(co_ip_genes)) {
@@ -619,7 +619,7 @@ We normalize the scores to percentages for easy integration with our other score
 ```{r, cache = TRUE}
 # Initialize data table.
 tmp <- co_ip_genes[ , 1:4]
-tmp$`Watson Similarity` <- 0
+tmp$`Watson BAG3 Similarity` <- 0
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 5:7])
 
 # Add the scores.
@@ -629,7 +629,7 @@ for (gene in 1:nrow(predictive)) {
       co_ip_genes[row, 5] <- predictive[gene, 3]}}}
 
 # Normalize the scores.
-co_ip_genes$`Watson Similarity` <- co_ip_genes$`Watson Similarity` * 100
+co_ip_genes$`Watson BAG3 Similarity` <- co_ip_genes$`Watson BAG3 Similarity` * 100
 
 # Integrate scores into the BAG3 Specificity column.
 for (row in 1:nrow(co_ip_genes)) {
