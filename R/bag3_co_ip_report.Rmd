@@ -504,9 +504,9 @@ By importing the graph data into R, we can see which of these intermediate genes
 
 ```{r}
 watson_direct_graph <- fread(file.path(
-  assets_dir, "watson", "relationshipgraph-bag3-co-ip-direct-to-bag3.csv"))
+  assets_dir, "watson", "network-relationshipgraph-bag3-co-ip-direct-to-bag3.csv"))
 watson_indirect_graph <- fread(file.path(
-  assets_dir, "watson", "relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"))
+  assets_dir, "watson", "network-relationshipgraph-bag3-co-ip-indirect-to-bag3.csv"))
 watson_direct_graph <- watson_direct_graph[ , c(
   "Source name", "Target name", "Confidence"), with = FALSE]
 watson_indirect_graph <- watson_indirect_graph[ , c("Source name", "Target name"), with = FALSE]
