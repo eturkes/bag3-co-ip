@@ -593,22 +593,22 @@ The subsections below describe the results obtained.
 
 ### Similarity Tree
 
-![](../assets/watson/predictive-tree.png)
+![](../assets/watson/analytics-tree.png)
 
 ### Distance Network
 
-![](../assets/watson/predictive-distance.png)
+![](../assets/watson/analytics-distance.png)
 
 ### Ranking Table
 
 ```{r}
-predictive <- fread(file.path(assets_dir, "watson", "predictive-neighborhoodgraph.csv"))
-predictive_cols <- c("Gene", "Set", "Similarity")
-predictive <- plyr::rename(predictive, c( # Resolve masking conflict.
-  "Display name" = predictive_cols[1], "Similarity score" = predictive_cols[3]))
-predictive <- predictive[ , predictive_cols, with = FALSE]
-predictive <- predictive[-nrow(predictive), ] # Remove empty last row.
-datatable(predictive) %>%
+analytics <- fread(file.path(assets_dir, "watson", "analytics-neighborhoodgraph.csv"))
+analytics_cols <- c("Gene", "Set", "Similarity")
+analytics <- plyr::rename(analytics, c( # Resolve masking conflict.
+  "Display name" = analytics_cols[1], "Similarity score" = analytics_cols[3]))
+analytics <- analytics[ , analytics_cols, with = FALSE]
+analytics <- analytics[-nrow(analytics), ] # Remove empty last row.
+datatable(analytics) %>%
   formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -623,10 +623,10 @@ tmp$`Watson BAG3 Similarity` <- 0
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 5:7])
 
 # Add the scores.
-for (gene in 1:nrow(predictive)) {
+for (gene in 1:nrow(analytics)) {
   for (row in 1:nrow(co_ip_genes)) {
-    if (co_ip_genes[row, 1] == predictive[gene, 1]) {
-      co_ip_genes[row, 5] <- predictive[gene, 3]}}}
+    if (co_ip_genes[row, 1] == analytics[gene, 1]) {
+      co_ip_genes[row, 5] <- analytics[gene, 3]}}}
 
 # Normalize the scores.
 co_ip_genes$`Watson BAG3 Similarity` <- co_ip_genes$`Watson BAG3 Similarity` * 100
