@@ -1,20 +1,20 @@
 ---
-title:               "BAG3 Co-IP MS Report"
+title: "BAG3 Co-IP MS Report"
 author:
-  - name:            "Emir Turkes"
-  - name:            "Columbia University"
-date:                '`r strftime(Sys.time(), format = "%B %d, %Y")`'
-bibliography:        "../bag3-co-ip.bib"
-biblio-style:        apalike
-link-citations:      true
+  - name: "Emir Turkes"
+  - name: "Columbia University"
+date: '`r strftime(Sys.time(), format = "%B %d, %Y")`'
+bibliography: "../bag3-co-ip.bib"
+biblio-style: apalike
+link-citations: true
 output:
   html_document:
     number_sections: true
-    theme:           lumen
-    toc:             true
-    toc_depth:       2
+    theme: lumen
+    toc: true
+    toc_depth: 2
     toc_float:
-      collapsed:     false
+      collapsed: false
       smooth_scroll: false
 knit:
   (function(inputFile, encoding) {
@@ -37,7 +37,8 @@ knit:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-knitr::opts_chunk$set(echo = TRUE, fig.width = 8.5)
+knitr::opts_chunk$set(fig.width = 8.5)
+
 library(magrittr)
 ```
 
@@ -104,7 +105,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 
 # ~~~ Breakdown of Methods ~~~ {-}
 
-The following top-level sections breakdown the methods used to perform the analysis.
+The following top-level sections break down the methods used to perform the analysis and only needs to be read if one is interested.
 We start by setting some global variables and loading in any required packages.
 
 ```{r}
@@ -281,7 +282,6 @@ co_ip_genes_qrilc[[cols[2]]] <- log2(co_ip_genes_qrilc[[cols[3]]] / co_ip_genes_
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_qrilc <- co_ip_genes_qrilc[order(
   -co_ip_genes_qrilc[[cols[2]]], co_ip_genes_qrilc[[cols[4]]]), ]
-
 eturkesRutils::datatable(co_ip_genes_qrilc) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -308,7 +308,6 @@ co_ip_genes_hm[[cols[2]]] <- log2(co_ip_genes_hm[[cols[3]]] / co_ip_genes_hm[[co
 
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_hm <- co_ip_genes_hm[order(-co_ip_genes_hm[[cols[2]]], co_ip_genes_hm[[cols[4]]]), ]
-
 eturkesRutils::datatable(co_ip_genes_hm) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -336,7 +335,6 @@ co_ip_genes_10min[[cols[2]]] <- log2(co_ip_genes_10min[[cols[3]]] / co_ip_genes_
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_10min <- co_ip_genes_10min[order(
   -co_ip_genes_10min[[cols[2]]], co_ip_genes_10min[[cols[4]]]), ]
-
 eturkesRutils::datatable(co_ip_genes_10min) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -365,7 +363,6 @@ co_ip_genes_cond_min[[cols[2]]] <- log2(
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_cond_min <- co_ip_genes_cond_min[order(
   -co_ip_genes_cond_min[[cols[2]]], co_ip_genes_cond_min[[cols[4]]]), ]
-
 eturkesRutils::datatable(co_ip_genes_cond_min) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -386,8 +383,9 @@ for (row in 1:nrow(co_ip_genes_spec)) {
     mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])}}
 mvi_dts <- list(
   co_ip_genes_spec, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min)
-mvi_benchmark <- data.table("Missing Value Gene" = mvi_genes, "Original Rank" = 0, "QRILC Rank" = 0,
-                            "HM Rank" = 0, "10% Min Rank" = 0, "Within Condition Min Rank" = 0)
+mvi_benchmark <- data.table(
+  "Missing Value Gene" = mvi_genes, "Original Rank" = 0, "QRILC Rank" = 0,
+  "HM Rank" = 0, "10% Min Rank" = 0, "Within Condition Min Rank" = 0)
 
 # Add values from data table list.
 col_count <- 1
@@ -435,6 +433,7 @@ scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
 co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
 cols <- c("Gene", "Scaled Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
 colnames(co_ip_genes)[2] <- cols[2]
+
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
@@ -457,12 +456,14 @@ The table is sorted from highest p values to low, to show what might be filtered
 ```{r, cache = TRUE}
 ibb_out <- ibb.test(
   co_ip_genes[ , 3:4], colSums(co_ip_genes[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1)
-saveRDS(ibb_out, file = file.path(results_dir, "data", "ibb_out.rds"))
 ```
 
 ```{r}
+saveRDS(ibb_out, file = file.path(results_dir, "data", "ibb_out.rds"))
+
 co_ip_genes <- cbind(co_ip_genes, ibb_out$p.value)
 colnames(co_ip_genes)[5] <- "p-value"
+
 co_ip_genes <- co_ip_genes[order(-co_ip_genes$`p-value`)]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
@@ -472,6 +473,7 @@ Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries
 
 ```{r}
 co_ip_genes <- co_ip_genes[co_ip_genes$`p-value` < 0.05, ]
+
 co_ip_genes <- co_ip_genes[order(co_ip_genes$`p-value`)]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
@@ -541,6 +543,7 @@ for (gene in 1:nrow(watson_direct_graph)) {
   for (row in 1:nrow(co_ip_genes)) {
     if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
       co_ip_genes[row, 3] <- watson_direct_graph[gene, 3]}}}
+
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`Watson Specificity Confidence`, -co_ip_genes$`Scaled Abundance Ratio`), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -560,6 +563,7 @@ co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
 for (row in 1:nrow(co_ip_genes)) {
   if (co_ip_genes[row, 4] > co_ip_genes[row, 3]) {
     co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 2]) / 2 )}}
+
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -589,13 +593,18 @@ Similarity type = Combined # Both Text and Chemical.
 Validation entities = HSPA8, VIM # Improves the ranking of candidate entities.
 ```
 
-The subsections below describe the results obtained.
+Below are the results obtained.
 
 ### Similarity Tree
+
+A visual depiction of candidate and known set similarity, where connected nodes and meaningfully similar.
+Note that the length of lines do not carry any significance.
 
 ![](../assets/watson/analytics-tree.png)
 
 ### Distance Network
+
+Similar to the similarity tree except that nodes are now spatially oriented with other similar nodes and distances are meaningful.
 
 ![](../assets/watson/analytics-distance.png)
 
@@ -608,6 +617,7 @@ analytics <- plyr::rename(analytics, c( # Resolve masking conflict.
   "Display name" = analytics_cols[1], "Similarity score" = analytics_cols[3]))
 analytics <- analytics[ , analytics_cols, with = FALSE]
 analytics <- analytics[-nrow(analytics), ] # Remove empty last row.
+
 datatable(analytics) %>%
   formatStyle(cols[1], `text-align` = "center")
 ```
