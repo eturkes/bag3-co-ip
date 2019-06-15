@@ -551,8 +551,13 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 ```
 
 We see that Watson ranks some previously mid/low tier genes quite highly.
-In order to better integrate the two scores, we can combine them in a very simple way, where we average the two scores together, but only if the abundance ratio is higher than the Watson confidence score.
-We choose to do this because any appearance of gene in Watson should potentially increase, but never decrease, the likelihood that it truly Co-IP's with BAG3, even when there is a low confidence score.
+In order to better integrate the confidence score into our understanding of the scaled abundance ratio, we add it in a scaled manner relative to the remaining value left in the max range of the ratio (i.e. $100$), as represented by the following equation:
+
+\begin{equation*}
+BAG3_{specificity} = (100 - Abundance_{ratio}) \times (\frac{Watson_{score}}{100})
+\end{equation*}
+
+This method attempts to properly weight the scores such that ratios in the upper range increase with greater scrutiny.
 
 ```{r}
 # Initialize data table.
@@ -561,8 +566,9 @@ tmp$`BAG3 Specificity` <- co_ip_genes$`Scaled Abundance Ratio`
 co_ip_genes <- cbind(tmp, co_ip_genes[ , 2:6])
 
 for (row in 1:nrow(co_ip_genes)) {
-  if (co_ip_genes[row, 4] > co_ip_genes[row, 3]) {
-    co_ip_genes[row, 2] <- ((co_ip_genes[row, 4] + co_ip_genes[row, 2]) / 2 )}}
+  remaining <- 100 - co_ip_genes[row, 2]
+  scaled_score <- remaining * (co_ip_genes[row, 4] / 100)
+  co_ip_genes[row, 2] <- co_ip_genes[row, 2] + scaled_score}
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
@@ -624,7 +630,7 @@ datatable(analytics) %>%
 
 ### Add Similarity Scores to Dataset
 
-We normalize the scores to percentages for easy integration with our other scores and then use the same averaging method as when adding the confidence scores.
+We normalize the scores to percentages for easy integration with our other scores and then use the same method to integrate them as with the confidence scores.
 
 ```{r, cache = TRUE}
 # Initialize data table.
@@ -643,8 +649,9 @@ co_ip_genes$`Watson BAG3 Similarity` <- co_ip_genes$`Watson BAG3 Similarity` * 1
 
 # Integrate scores into the BAG3 Specificity column.
 for (row in 1:nrow(co_ip_genes)) {
-  if (co_ip_genes[row, 5] > co_ip_genes[row, 2]) {
-    co_ip_genes[row, 2] <- ((co_ip_genes[row, 5] + co_ip_genes[row, 2]) / 2 )}}
+  remaining <- 100 - co_ip_genes[row, 2]
+  scaled_score <- remaining * (co_ip_genes[row, 5] * 0.01)
+  co_ip_genes[row, 2] <- co_ip_genes[row, 2] + scaled_score}
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
