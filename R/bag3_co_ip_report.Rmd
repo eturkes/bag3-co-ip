@@ -155,7 +155,7 @@ In best case scenarios, this may be all that is needed.
 ```{r}
 # Rename and subset columns.
 cols <- c("Gene", "Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
-co_ip_genes <- plyr::rename(co_ip_genes, c( # Resolve masking conflict.
+co_ip_genes <- plyr::rename(co_ip_genes, c(
   "Description" = cols[1], "Summed Abundance Ratio (log2): (Scr) / (SH)" = cols[2],
   "Scr Abundances" = cols[3], "SH Abundances" = cols[4]))
 co_ip_genes <- co_ip_genes[ , cols, with = FALSE]
@@ -412,7 +412,7 @@ To further explore these distributions, we can assess the normality of the abund
 abun_ratio <- data.table(
   "QRILC" = co_ip_genes_qrilc[[cols[2]]], "HM" = co_ip_genes_hm[[cols[2]]],
   "10% Min" = co_ip_genes_10min[[cols[2]]], "Within Condition Min" = co_ip_genes_cond_min[[cols[2]]])
-abun_ratio <- reshape2::melt(abun_ratio, id.vars = NULL) # Resolve masking conflict.
+abun_ratio <- reshape2::melt(abun_ratio, id.vars = NULL)
 
 ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
   geom_density(alpha = 0.25) + xlab("Abundance Ratio"))
@@ -619,7 +619,7 @@ Similar to the similarity tree except that nodes are now spatially oriented with
 ```{r}
 analytics <- fread(file.path(assets_dir, "watson", "analytics-neighborhoodgraph.csv"))
 analytics_cols <- c("Gene", "Set", "Similarity")
-analytics <- plyr::rename(analytics, c( # Resolve masking conflict.
+analytics <- plyr::rename(analytics, c(
   "Display name" = analytics_cols[1], "Similarity score" = analytics_cols[3]))
 analytics <- analytics[ , analytics_cols, with = FALSE]
 analytics <- analytics[-nrow(analytics), ] # Remove empty last row.
