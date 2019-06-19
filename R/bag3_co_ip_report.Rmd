@@ -37,7 +37,7 @@ knit:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(fig.width = 8.5, fig.height = 7, error = TRUE)
 
 library(magrittr)
 ```
@@ -454,8 +454,14 @@ Below, we apply the beta-binomial model to our dataset using the R package devel
 The table is sorted from highest p values to low, to show what might be filtered out when we apply a cutoff.
 
 ```{r, cache = TRUE}
-ibb_out <- ibb.test(
-  co_ip_genes[ , 3:4], colSums(co_ip_genes[ , 3:4]), c(rep("pre", 1), rep("post", 1)), n.threads = -1)
+rds <- file.path(assets_dir, "cache", "ibb_out.rds")
+if (file.exists(rds)) {
+  ibb_out <- readRDS(rds)
+} else {
+  ibb_out <- ibb.test(
+    co_ip_genes[ , 3:4], colSums(co_ip_genes[ , 3:4]),
+    c(rep("pre", 1), rep("post", 1)), n.threads = -1)
+  saveRDS(ibb_out, rds)}
 ```
 
 ```{r}
@@ -632,7 +638,7 @@ datatable(analytics) %>%
 
 We normalize the scores to percentages for easy integration with our other scores and then use the same method to integrate them as with the confidence scores.
 
-```{r, cache = TRUE}
+```{r}
 # Initialize data table.
 tmp <- co_ip_genes[ , 1:4]
 tmp$`Watson BAG3 Similarity` <- 0
