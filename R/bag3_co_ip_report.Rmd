@@ -1,7 +1,7 @@
 ---
 title: "BAG3 Co-IP MS Report"
 author:
-  - name: "Emir Turkes"
+  - name: "Emir Turkes [et2628@cumc.columbia.edu]"
   - name: "Columbia University"
 date: '`r strftime(Sys.time(), format = "%B %d, %Y")`'
 bibliography: "../bag3-co-ip.bib"
@@ -11,6 +11,7 @@ output:
   html_document:
     number_sections: true
     theme: lumen
+    highlight: zenburn
     toc: true
     toc_depth: 2
     toc_float:
@@ -109,23 +110,11 @@ The following top-level sections break down the methods used to perform the anal
 We start by setting some global variables and loading in any required packages.
 
 ```{r}
-library(conflicted)
-library(devtools)
-library(data.table)
-library(readxl)
-library(DT)
-library(plyr)
-library(stringr)
-library(tidyr)
-library(imputeLCMD)
-library(magrittr)
-library(tibble)
-library(reshape2)
-library(plotly)
-library(ibb)
-```
+packages <- c(
+  "conflicted", "data.table", "readxl", "DT", "plyr", "stringr", "tidyr",
+  "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
+invisible(suppressMessages(lapply(packages, library, character.only = TRUE)))
 
-```{r}
 assets_dir <- file.path(getwd(), "..", "assets")
 results_dir <- file.path(getwd(), "..", "results")
 ```
@@ -668,12 +657,10 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 # References
 
 This is the concluding section of the document.
-Here we write relevant results to disk, output the `session_info`, and create a bibliography for works cited.
+Here we write relevant results to disk, output the `sessionInfo`, and create a bibliography for works cited.
 
 ```{r}
 saveRDS(co_ip_genes, file = file.path(results_dir, "data", "co_ip_genes.rds"))
-```
 
-```{r}
-session_info()
+sessionInfo()
 ```
