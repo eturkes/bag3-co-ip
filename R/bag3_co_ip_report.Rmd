@@ -107,7 +107,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 # ~~~ Breakdown of Methods ~~~ {-}
 
 The following top-level sections break down the methods used to perform the analysis and only needs to be read if one is interested.
-We start by setting some global variables and loading in any required packages.
+We start by loading in any required packages and setting some global variables.
 
 ```{r}
 packages <- c(
