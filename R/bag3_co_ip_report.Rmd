@@ -117,6 +117,10 @@ invisible(suppressMessages(lapply(packages, library, character.only = TRUE)))
 
 assets_dir <- file.path(getwd(), "..", "assets")
 results_dir <- file.path(getwd(), "..", "results")
+
+# Create a cache for storing the objects of long-running computations.
+if (!dir.exists(file.path(assets_dir, "cache"))) {
+  dir.create(file.path(assets_dir, "cache"))}
 ```
 
 # Original Data
@@ -158,6 +162,7 @@ co_ip_genes[[cols[1]]] <- str_extract(co_ip_genes[[cols[1]]], "(?<=GN=).*(?= PE=
 co_ip_genes <- co_ip_genes[rowSums(is.na(co_ip_genes[ , 1])) != 1, ]
 watson_genes <- fread(file.path(assets_dir, "watson", "EntitySet-bag3-co-ip.csv"))
 co_ip_genes[[cols[1]]] <- watson_genes$`Entity name`
+rm(watson_genes)
 
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
@@ -172,16 +177,16 @@ The schemes can be cycled through the tabs below.
 ### Specificity with BAG3
 
 ```{r}
-co_ip_genes_spec <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_spec) %>% # From my own package, provides custom formatting.
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
+eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
 
 ```{r}
-co_ip_genes_abun <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_abun) %>% # From my own package, provides custom formatting.
+co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
+eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -264,6 +269,7 @@ co_ip_genes_qrilc <- rownames_to_column(co_ip_genes_qrilc, var = "Gene")
 setDT(co_ip_genes_qrilc)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_qrilc[[cols[4]]]
 co_ip_genes_qrilc <- co_ip_genes_tmp
+rm(co_ip_genes_qrilc_tmp)
 
 # Recalculate abundance ratio.
 co_ip_genes_qrilc[[cols[2]]] <- log2(co_ip_genes_qrilc[[cols[3]]] / co_ip_genes_qrilc[[cols[4]]])
@@ -291,6 +297,7 @@ co_ip_genes_hm <- rownames_to_column(co_ip_genes_hm, var = "Gene")
 setDT(co_ip_genes_hm)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_hm[[cols[4]]]
 co_ip_genes_hm <- co_ip_genes_tmp
+rm(co_ip_genes_hm_tmp)
 
 # Recalculate abundance ratio.
 co_ip_genes_hm[[cols[2]]] <- log2(co_ip_genes_hm[[cols[3]]] / co_ip_genes_hm[[cols[4]]])
@@ -317,6 +324,7 @@ co_ip_genes_10min <- rownames_to_column(co_ip_genes_10min, var = "Gene")
 setDT(co_ip_genes_10min)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_10min[[cols[4]]]
 co_ip_genes_10min <- co_ip_genes_tmp
+rm(co_ip_genes_10min_tmp)
 
 # Recalculate abundance ratio.
 co_ip_genes_10min[[cols[2]]] <- log2(co_ip_genes_10min[[cols[3]]] / co_ip_genes_10min[[cols[4]]])
@@ -344,6 +352,7 @@ co_ip_genes_cond_min <- rownames_to_column(co_ip_genes_cond_min, var = "Gene")
 setDT(co_ip_genes_cond_min)
 co_ip_genes_tmp[[cols[4]]] <- co_ip_genes_cond_min[[cols[4]]]
 co_ip_genes_cond_min <- co_ip_genes_tmp
+rm(co_ip_genes_cond_min_tmp)
 
 # Recalculate abundance ratio.
 co_ip_genes_cond_min[[cols[2]]] <- log2(
@@ -367,11 +376,11 @@ The ranking ranges from $1-95$.
 ```{r}
 # Initialize data table.
 mvi_genes <- c()
-for (row in 1:nrow(co_ip_genes_spec)) {
-  if (co_ip_genes_spec[[row, cols[4]]] == 0) {
-    mvi_genes <- c(mvi_genes, co_ip_genes_spec[[row, cols[1]]])}}
+for (row in 1:nrow(co_ip_genes)) {
+  if (co_ip_genes[[row, cols[4]]] == 0) {
+    mvi_genes <- c(mvi_genes, co_ip_genes[[row, cols[1]]])}}
 mvi_dts <- list(
-  co_ip_genes_spec, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min)
+  co_ip_genes, co_ip_genes_qrilc, co_ip_genes_hm, co_ip_genes_10min, co_ip_genes_cond_min)
 mvi_benchmark <- data.table(
   "Missing Value Gene" = mvi_genes, "Original Rank" = 0, "QRILC Rank" = 0,
   "HM Rank" = 0, "10% Min Rank" = 0, "Within Condition Min Rank" = 0)
@@ -410,6 +419,13 @@ ggplotly(ggplot(abun_ratio, aes(x = value, fill = variable)) +
 As the figure shows, the 10% Min method moved the abundance ratio closest to a normal distribution, although the improvement is only slight.
 Therefore, we use the data table after 10% Min imputation for the following sections.
 
+```{r}
+co_ip_genes <- co_ip_genes_10min
+rm(
+  co_ip_genes_10min, co_ip_genes_cond_min, co_ip_genes_hm, co_ip_genes_mvi,
+  co_ip_genes_qrilc, co_ip_genes_tmp, abun_ratio, mvi_benchmark, mvi_dts, set)
+```
+
 # Scaling and Normalization
 
 For easier analysis and interpretation, we have decided to scale and normalize the values in the Abundance Ratio column.
@@ -417,7 +433,6 @@ Some of this work has been done already in the previous section, namely, the max
 Next, we undo the log transformation and scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence and similarity values.
 
 ```{r}
-co_ip_genes <- co_ip_genes_10min
 scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
 co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
 cols <- c("Gene", "Scaled Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
@@ -454,10 +469,9 @@ if (file.exists(rds)) {
 ```
 
 ```{r}
-saveRDS(ibb_out, file = file.path(results_dir, "data", "ibb_out.rds"))
-
 co_ip_genes <- cbind(co_ip_genes, ibb_out$p.value)
 colnames(co_ip_genes)[5] <- "p-value"
+rm(ibb_out)
 
 co_ip_genes <- co_ip_genes[order(-co_ip_genes$`p-value`)]
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -514,6 +528,7 @@ watson_direct_genes <- unique(
   as.vector(as.matrix(watson_direct_graph[ , c("Source name", "Target name")])))
 watson_inter_genes <- setdiff(watson_inter_genes, watson_direct_genes)
 common_genes <- Reduce(intersect, list(watson_inter_genes, co_ip_genes[[cols[1]]]))
+rm(watson_indirect_graph)
 
 cat(paste("The genes in common are:", common_genes, " "))
 ```
@@ -538,6 +553,7 @@ for (gene in 1:nrow(watson_direct_graph)) {
   for (row in 1:nrow(co_ip_genes)) {
     if (co_ip_genes[row, 1] == watson_direct_graph[gene, 2]) {
       co_ip_genes[row, 3] <- watson_direct_graph[gene, 3]}}}
+rm(watson_direct_graph)
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`Watson Specificity Confidence`, -co_ip_genes$`Scaled Abundance Ratio`), ]
@@ -647,6 +663,7 @@ for (row in 1:nrow(co_ip_genes)) {
   remaining <- 100 - co_ip_genes[row, 2]
   scaled_score <- remaining * (co_ip_genes[row, 5] * 0.01)
   co_ip_genes[row, 2] <- co_ip_genes[row, 2] + scaled_score}
+rm(analytics, remaining, scaled_score, tmp)
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
