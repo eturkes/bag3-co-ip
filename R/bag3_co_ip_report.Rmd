@@ -69,12 +69,12 @@ The source code and instructions for rerunning the analysis can be found at [git
 
 # Final Results
 
-**Read just this section for the final results of the analysis and a brief summary of the methods.**
+**Read just the following sub-section (1.1) for the final results of the analysis and a brief summary of the methods.**
 
 ## Cleaned Dataset {.tabset}
 
 The final Co-IP MS dataset after cleaning as described in the report’s method section.
-Briefly, the original dataset was subject to missing value imputation via a custom method, the abundance ratio was scaled to a range of $0-100$, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
+Briefly, the original dataset was subject to missing value imputation via a custom method, the abundance ratio was scaled to a range of 0-100, and changes between scr and shBAG3 conditions were hypothesis tested using the beta-binomial method.
 Additional validation was performed using Watson for Drug Discovery, which looks for literature and chemical relationships among entities.
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
@@ -106,7 +106,8 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 
 # ~~~ Breakdown of Methods ~~~ {-}
 
-The following top-level sections break down the methods used to perform the analysis and only needs to be read if one is interested.
+**Sections from here to the end break down the methods used and are optional to read.**
+
 We start by loading in any required packages and setting some global variables.
 
 ```{r}
@@ -219,7 +220,7 @@ Additionally, we try two custom techniques:
 - 10% Min: A variation of the HM technique which uses 10% of the minimum due to the reported 90% knockdown efficiency of the shBAG3 condition.
 - Within Condition Min: Takes the per condition minimum and applies it to all missing values within that condition.
 
-Note that in the previous data tables, the maximum value of the abundance ratio was $6.64$, representing the $log2$ of $100 fold change$.
+Note that in the previous data tables, the maximum value of the abundance ratio was 6.64, representing the $log2$ of 100 fold change.
 This maximum is an arbitrary limit set by Proteome Discoverer and we remove it for our recalculations.
 
 ```{r}
@@ -371,7 +372,7 @@ eturkesRutils::datatable(co_ip_genes_cond_min) %>% # From my own package, provid
 
 In order to benchmark the different approaches, we create a table that compares the ranking of missing value genes using the Specificity with BAG3 sort scheme.
 Note GSimp is missing because it failed to run (see its tab for debug details).
-The ranking ranges from $1-95$.
+The ranking ranges from 1-95.
 
 ```{r}
 # Initialize data table.
@@ -430,7 +431,7 @@ rm(
 
 For easier analysis and interpretation, we have decided to scale and normalize the values in the Abundance Ratio column.
 Some of this work has been done already in the previous section, namely, the maximum value threshold has been removed (values are no longer capped at $6.64 = log2(100)$).
-Next, we undo the log transformation and scale these values to a range of $0-100$ to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence and similarity values.
+Next, we undo the log transformation and scale these values to a range of 0-100 to allow for easier comparison with Watson for Drug Discovery, which uses the same scale for its confidence and similarity values.
 
 ```{r}
 scale_factor <- 100 / max(co_ip_genes[[cols[2]]])
@@ -538,7 +539,7 @@ There are no common intermediate genes, so we will disregard them for the rest o
 ### Add Confidence Scores to Dataset
 
 Though it is limited to only our six direct genes, WDD provides a `confidence_score` that assesses the quality of evidence for an association.
-It is normalized to a range of $0-100$ and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
+It is normalized to a range of 0-100 and can be integrated into our Co-IP data table, though interpretation is not necessarily straightforward.
 Also, because WDD differentiates up and downstream relationships, some genes have multiple confidence scores.
 While it would be ideal to combine confidence scores, due to the complexity of the confidence algorithm, we simply opt to choose the max value of each relationship.
 
@@ -562,7 +563,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 ```
 
 We see that Watson ranks some previously mid/low tier genes quite highly.
-In order to better integrate the confidence score into our understanding of the scaled abundance ratio, we add it in a scaled manner relative to the remaining value left in the max range of the ratio (i.e. $100$), as represented by the following equation:
+In order to better integrate the confidence score into our understanding of the scaled abundance ratio, we add it in a scaled manner relative to the remaining value left in the max range of the ratio (i.e. 100), as represented by the following equation:
 
 \begin{equation*}
 BAG3_{specificity} = (100 - Abundance_{ratio}) \times (\frac{Watson_{score}}{100})
