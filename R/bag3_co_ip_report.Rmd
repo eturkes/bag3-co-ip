@@ -79,7 +79,7 @@ Additional validation was performed using Watson for Drug Discovery, which looks
 Two sort schemes are presented, one to show specificity with BAG3 and another to show the most abundant Co-IP proteins.
 Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
 
-```{r, include = TRUE, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
 cols <- c(
   "Gene", "BAG3 Specificity", "Scaled Abundance Ratio", "Watson Specificity Confidence",
@@ -88,7 +88,7 @@ cols <- c(
 
 ### Specificity with BAG3
 
-```{r, include = TRUE, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -97,7 +97,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 
 ### Abundance of Protein
 
-```{r, include = TRUE, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[6]]], -co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
@@ -114,7 +114,7 @@ We start by loading in any required packages and setting some global variables.
 packages <- c(
   "conflicted", "data.table", "readxl", "DT", "plyr", "stringr", "tidyr",
   "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
-invisible(suppressMessages(lapply(packages, library, character.only = TRUE)))
+invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
 assets_dir <- file.path(getwd(), "..", "assets")
 results_dir <- file.path(getwd(), "..", "results")
