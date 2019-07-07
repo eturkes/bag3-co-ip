@@ -22,3 +22,12 @@ Analysis of BAG3 Co-IP MS data
 In order to run and view the results of this analysis, the prerequisite data is required.
 Please contact me at emir.turkes@eturkes.com if you are interested.
 Otherwise, feel free to reuse this codebase in accordance with the license.
+
+A Docker image for this project is available from [DockerHub](https://cloud.docker.com/repository/docker/eturkes/bag3-co-ip/general).  
+This is the recommended way to reproduce and explore the project.  
+
+To open RStudio, run:
+```
+docker-compose up rstudio
+```
+It will be available in your web browser at the address [localhost:8789](http://localhost:8789).
