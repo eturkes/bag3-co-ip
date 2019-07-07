@@ -17,19 +17,19 @@ FROM rocker/rstudio:3.6.0
 LABEL maintainer="Emir Turkes emir.turkes@eturkes.com"
 
 RUN Rscript -e "install.packages('conflicted')" \
-    && Rscript -e "install.packages('rmarkdown')" \
-    && Rscript -e "install.packages('rprojroot')" \
-    && Rscript -e "install.packages('data.table')" \
-    && Rscript -e "install.packages('readxl')" \
-    && Rscript -e "install.packages('DT')" \
-    && Rscript -e "install.packages('plyr')" \
-    && Rscript -e "install.packages('stringr')" \
-    && Rscript -e "install.packages('tidyr')" \
-    && Rscript -e "install.packages('imputeLCMD')" \
-    && Rscript -e "install.packages('magrittr')" \
-    && Rscript -e "install.packages('tibble')" \
-    && Rscript -e "install.packages('reshape2')" \
-    && Rscript -e "install.packages('plotly')" \
+    -e "install.packages('rmarkdown')" \
+    -e "install.packages('rprojroot')" \
+    -e "install.packages('data.table')" \
+    -e "install.packages('readxl')" \
+    -e "install.packages('DT')" \
+    -e "install.packages('plyr')" \
+    -e "install.packages('stringr')" \
+    -e "install.packages('tidyr')" \
+    -e "install.packages('imputeLCMD')" \
+    -e "install.packages('magrittr')" \
+    -e "install.packages('tibble')" \
+    -e "install.packages('reshape2')" \
+    -e "install.packages('plotly')" \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/ \
         /tmp/downloaded_packages/ \
