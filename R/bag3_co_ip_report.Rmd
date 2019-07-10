@@ -83,7 +83,6 @@ packages <- c(
   "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
 
-assets_dir <- file.path(getwd(), "..", "assets")
 results_dir <- file.path(getwd(), "..", "results")
 
 # Adds download buttons and exponential values.
