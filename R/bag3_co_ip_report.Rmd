@@ -86,6 +86,18 @@ invisible(suppressPackageStartupMessages(lapply(packages, library, character.onl
 assets_dir <- file.path(getwd(), "..", "assets")
 results_dir <- file.path(getwd(), "..", "results")
 
+# Adds download buttons and exponential values.
+datatable_custom <- function(dt) {
+  datatable(
+    dt,
+    extensions = "Buttons", options = list(dom = "Blfrtip", buttons = list(
+      "copy", "print",
+      list(extend = "collection", buttons = c("csv", "excel", "pdf"), text = "Download")),
+    rowCallback = JS(
+      "function(row, data) {for (i = 1; i < data.length; i++) {if (data[i]>1000 | data[i]<1) {",
+        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
+      "}}}")))}
+
 co_ip_genes <- readRDS(file.path(results_dir, "data", "co_ip_genes.rds"))
 cols <- c(
   "Gene", "BAG3 Specificity", "Scaled Abundance Ratio", "Watson Specificity Confidence",
@@ -97,7 +109,7 @@ cols <- c(
 ```{r, echo = FALSE, message = FALSE}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -106,7 +118,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 ```{r, echo = FALSE, message = FALSE}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[6]]], -co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -128,6 +140,18 @@ results_dir <- file.path(getwd(), "..", "results")
 # Create a cache for storing the objects of long-running computations.
 if (!dir.exists(file.path(assets_dir, "cache"))) {
   dir.create(file.path(assets_dir, "cache"))}
+
+# Adds download buttons and exponential values.
+datatable_custom <- function(dt) {
+  datatable(
+    dt,
+    extensions = "Buttons", options = list(dom = "Blfrtip", buttons = list(
+      "copy", "print",
+      list(extend = "collection", buttons = c("csv", "excel", "pdf"), text = "Download")),
+    rowCallback = JS(
+      "function(row, data) {for (i = 1; i < data.length; i++) {if (data[i]>1000 | data[i]<1) {",
+        "$('td:eq('+i+')', row).html(data[i].toExponential(2));",
+      "}}}")))}
 ```
 
 # Original Data
@@ -139,9 +163,6 @@ The table below is unedited except for minimal formatting outside of R for easie
 ```{r}
 co_ip_genes <- data.table(read_excel(file.path(
   assets_dir, "proteome-discoverer", "Ji_ProteinReport-ProteinReport_17-155-edited.xlsx")))
-
-# This should use eturkesRutils::datatable but the exponential conversion didn't work on this table.
-# So, we recreate it excluding that feature.
 datatable(co_ip_genes, extensions = "Buttons", options = list(
   dom = "Blfrtip", buttons = list("copy", "print", list(
     extend = "collection", buttons = c("csv", "excel", "pdf"), text = "Download"))))
@@ -171,7 +192,7 @@ watson_genes <- fread(file.path(assets_dir, "watson", "EntitySet-bag3-co-ip.csv"
 co_ip_genes[[cols[1]]] <- watson_genes$`Entity name`
 rm(watson_genes)
 
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -185,7 +206,7 @@ The schemes can be cycled through the tabs below.
 
 ```{r}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -193,7 +214,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 
 ```{r}
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[3]]], -co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -284,7 +305,7 @@ co_ip_genes_qrilc[[cols[2]]] <- log2(co_ip_genes_qrilc[[cols[3]]] / co_ip_genes_
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_qrilc <- co_ip_genes_qrilc[order(
   -co_ip_genes_qrilc[[cols[2]]], co_ip_genes_qrilc[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_qrilc) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes_qrilc) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -311,7 +332,7 @@ co_ip_genes_hm[[cols[2]]] <- log2(co_ip_genes_hm[[cols[3]]] / co_ip_genes_hm[[co
 
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_hm <- co_ip_genes_hm[order(-co_ip_genes_hm[[cols[2]]], co_ip_genes_hm[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_hm) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes_hm) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -339,7 +360,7 @@ co_ip_genes_10min[[cols[2]]] <- log2(co_ip_genes_10min[[cols[3]]] / co_ip_genes_
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_10min <- co_ip_genes_10min[order(
   -co_ip_genes_10min[[cols[2]]], co_ip_genes_10min[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_10min) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes_10min) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -368,7 +389,7 @@ co_ip_genes_cond_min[[cols[2]]] <- log2(
 # Use sort from Specificity with BAG3 as it best displays the effects of imputation.
 co_ip_genes_cond_min <- co_ip_genes_cond_min[order(
   -co_ip_genes_cond_min[[cols[2]]], co_ip_genes_cond_min[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes_cond_min) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes_cond_min) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -401,7 +422,7 @@ for (set in mvi_dts) {
       if (set[[dts_row, 1]] == mvi_benchmark[[benchmark_row, 1]]) {
         mvi_benchmark[benchmark_row, col_count] <- dts_row}}}}
 
-eturkesRutils::datatable(mvi_benchmark) %>% # From my own package, provides custom formatting.
+datatable_custom(mvi_benchmark) %>%
   formatStyle("Missing Value Gene", `text-align` = "center")
 ```
 
@@ -445,7 +466,7 @@ co_ip_genes[[cols[2]]] <- co_ip_genes[[cols[2]]] * scale_factor
 cols <- c("Gene", "Scaled Abundance Ratio", "scrRNA Abundance", "shBAG3 Abundance")
 colnames(co_ip_genes)[2] <- cols[2]
 
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -481,7 +502,7 @@ colnames(co_ip_genes)[5] <- "p-value"
 rm(ibb_out)
 
 co_ip_genes <- co_ip_genes[order(-co_ip_genes$`p-value`)]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -491,7 +512,7 @@ Next, we apply a standard cutoff at $p < 0.05$, removing the first three entries
 co_ip_genes <- co_ip_genes[co_ip_genes$`p-value` < 0.05, ]
 
 co_ip_genes <- co_ip_genes[order(co_ip_genes$`p-value`)]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(2) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -564,7 +585,7 @@ rm(watson_direct_graph)
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`Watson Specificity Confidence`, -co_ip_genes$`Scaled Abundance Ratio`), ]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(c(2, 3)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -590,7 +611,7 @@ for (row in 1:nrow(co_ip_genes)) {
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(c(2, 3, 4)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
@@ -674,7 +695,7 @@ rm(analytics, remaining, scaled_score, tmp)
 
 co_ip_genes <- co_ip_genes[order(
   -co_ip_genes$`BAG3 Specificity`, co_ip_genes[[cols[4]]]), ]
-eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
+datatable_custom(co_ip_genes) %>%
   formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
