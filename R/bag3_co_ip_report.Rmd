@@ -39,8 +39,6 @@ knit:
 # limitations under the License.
 
 knitr::opts_chunk$set(fig.width = 8.5, fig.height = 7)
-
-library(magrittr)
 ```
 
 <style type="text/css">
@@ -80,7 +78,15 @@ Two sort schemes are presented, one to show specificity with BAG3 and another to
 Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
 
 ```{r, echo = FALSE, message = FALSE}
-co_ip_genes <- readRDS(file.path(getwd(), "..", "results", "data", "co_ip_genes.rds"))
+packages <- c(
+  "conflicted", "data.table", "readxl", "DT", "plyr", "stringr", "tidyr",
+  "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
+invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
+
+assets_dir <- file.path(getwd(), "..", "assets")
+results_dir <- file.path(getwd(), "..", "results")
+
+co_ip_genes <- readRDS(file.path(results_dir, "data", "co_ip_genes.rds"))
 cols <- c(
   "Gene", "BAG3 Specificity", "Scaled Abundance Ratio", "Watson Specificity Confidence",
   "Watson BAG3 Similarity", "scrRNA Abundance", "shBAG3 Abundance")
@@ -92,7 +98,7 @@ cols <- c(
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[2]]], co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
-  DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
 ### Abundance of Protein
@@ -101,7 +107,7 @@ eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom
 co_ip_genes <- co_ip_genes[order(-co_ip_genes[[cols[6]]], -co_ip_genes[[cols[7]]]), ]
 rownames(co_ip_genes) <- NULL # Reset row numbers.
 eturkesRutils::datatable(co_ip_genes) %>% # From my own package, provides custom formatting.
-  DT::formatRound(c(2, 3, 4, 5)) %>% DT::formatStyle(cols[1], `text-align` = "center")
+  formatRound(c(2, 3, 4, 5)) %>% formatStyle(cols[1], `text-align` = "center")
 ```
 
 # ~~~ Breakdown of Methods ~~~ {-}
