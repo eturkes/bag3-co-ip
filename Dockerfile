@@ -25,11 +25,14 @@ RUN Rscript -e "install.packages('conflicted')" \
     -e "install.packages('plyr')" \
     -e "install.packages('stringr')" \
     -e "install.packages('tidyr')" \
-    -e "install.packages('imputeLCMD')" \
     -e "install.packages('magrittr')" \
     -e "install.packages('tibble')" \
     -e "install.packages('reshape2')" \
     -e "install.packages('plotly')" \
+    -e "install.packages('BiocManager')" \
+    -e "BiocManager::install('pcaMethods')" \
+    -e "BiocManager::install('impute')" \
+    -e "install.packages('imputeLCMD')" \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/ \
         /tmp/downloaded_packages/ \
