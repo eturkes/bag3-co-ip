@@ -17,14 +17,19 @@ limitations under the License.
 # BAG3 Co-IP MS Analysis
 #### *This analysis is considered complete and should not see major updates*
 
-Analysis of BAG3 Co-IP MS data  
+Analysis of BAG3 Co-IP MS data
 
 In order to run and view the results of this analysis, the prerequisite data is required.
 Please contact me at emir.turkes@eturkes.com if you are interested.
-Otherwise, feel free to reuse this codebase in accordance with the license.
+After obtaining the data, it should be unzipped and its directory moved to the project root and renamed as `gdrive`.
 
-A Docker image for this project is available from [DockerHub](https://cloud.docker.com/repository/docker/eturkes/bag3-co-ip/general).  
-This is the recommended way to reproduce and explore the project.  
+A Docker image for this project is available from [DockerHub](https://cloud.docker.com/repository/docker/eturkes/bag3-co-ip/general).
+This is the recommended way to reproduce and explore the project.
+
+To run all scripts and generate an HTML report in the `results` directory, just run:
+```
+docker-compose run all
+```
 
 To open RStudio, run:
 ```

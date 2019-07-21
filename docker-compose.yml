@@ -19,12 +19,12 @@ services:
     image: eturkes/bag3-co-ip:R3.6.0v2
     volumes:
       - ".:/bag3-co-ip:rw"
-    command: Rscript -e "source('/bag3-co-ip/R/run_all.R')"
+    command: Rscript -e "setwd('/bag3-co-ip/R/')" -e "rmarkdown::render('bag3_co_ip_report.Rmd', output_file = '../results/bag3-co-ip-report.html')"
 
   rstudio:
     image: eturkes/bag3-co-ip:R3.6.0v2
     volumes:
-      - ".:/bag3-co-ip:rw"
+      - ".:/home/rstudio/bag3-co-ip:rw"
     ports:
       - "127.0.0.1:8789:8787"
     environment:
