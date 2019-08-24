@@ -78,12 +78,14 @@ Two sort schemes are presented, one to show specificity with BAG3 and another to
 Ideally, the two schemes would be combined to show which proteins interacted most highly with BAG3, but this is nontrivial to do accurately considering experimental limitations.
 
 ```{r, echo = FALSE, message = FALSE}
+assets_dir <- file.path(getwd(), "..", "assets")
+results_dir <- file.path(getwd(), "..", "results")
+
+install.packages(file.path(assets_dir, "R-packages", "ibb"), repos = NULL, type = "source")
 packages <- c(
   "conflicted", "data.table", "readxl", "DT", "plyr", "stringr", "tidyr",
   "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
-
-results_dir <- file.path(getwd(), "..", "results")
 
 # Adds download buttons and exponential values.
 datatable_custom <- function(dt) {
@@ -128,13 +130,14 @@ datatable_custom(co_ip_genes) %>%
 We start by loading in any required packages and setting some global variables.
 
 ```{r}
+assets_dir <- file.path(getwd(), "..", "assets")
+results_dir <- file.path(getwd(), "..", "results")
+
+install.packages(file.path(assets_dir, "R-packages", "ibb"), repos = NULL, type = "source")
 packages <- c(
   "conflicted", "data.table", "readxl", "DT", "plyr", "stringr", "tidyr",
   "imputeLCMD", "magrittr", "tibble", "reshape2", "plotly", "ibb")
 invisible(suppressPackageStartupMessages(lapply(packages, library, character.only = TRUE)))
-
-assets_dir <- file.path(getwd(), "..", "assets")
-results_dir <- file.path(getwd(), "..", "results")
 
 # Create a cache for storing the objects of long-running computations.
 if (!dir.exists(file.path(assets_dir, "cache"))) {

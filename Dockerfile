@@ -29,10 +29,11 @@ RUN Rscript -e "install.packages('conflicted')" \
     -e "install.packages('tibble')" \
     -e "install.packages('reshape2')" \
     -e "install.packages('plotly')" \
+    -e "install.packages('devtools')" \
     -e "install.packages('BiocManager')" \
     -e "BiocManager::install('pcaMethods')" \
     -e "BiocManager::install('impute')" \
-    -e "install.packages('imputeLCMD')" \
+    -e "devtools:install_github('eturkes/imputeLCMD-eturkes')" \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/ \
         /tmp/downloaded_packages/ \
