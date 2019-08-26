@@ -16,24 +16,28 @@ FROM rocker/rstudio:3.6.0
 
 LABEL maintainer="Emir Turkes emir.turkes@eturkes.com"
 
-RUN Rscript -e "install.packages('conflicted')" \
-    -e "install.packages('rmarkdown')" \
-    -e "install.packages('rprojroot')" \
-    -e "install.packages('data.table')" \
-    -e "install.packages('readxl')" \
-    -e "install.packages('DT')" \
-    -e "install.packages('plyr')" \
-    -e "install.packages('stringr')" \
-    -e "install.packages('tidyr')" \
-    -e "install.packages('magrittr')" \
-    -e "install.packages('tibble')" \
-    -e "install.packages('reshape2')" \
-    -e "install.packages('plotly')" \
-    -e "install.packages('devtools')" \
-    -e "install.packages('BiocManager')" \
-    -e "BiocManager::install('pcaMethods')" \
-    -e "BiocManager::install('impute')" \
-    -e "devtools:install_github('eturkes/imputeLCMD-eturkes')" \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        zlib1g-dev \
+        libxml2-dev \
+    && Rscript -e "install.packages('conflicted')" \
+        -e "install.packages('rmarkdown')" \
+        -e "install.packages('rprojroot')" \
+        -e "install.packages('data.table')" \
+        -e "install.packages('readxl')" \
+        -e "install.packages('DT')" \
+        -e "install.packages('plyr')" \
+        -e "install.packages('stringr')" \
+        -e "install.packages('tidyr')" \
+        -e "install.packages('magrittr')" \
+        -e "install.packages('tibble')" \
+        -e "install.packages('reshape2')" \
+        -e "install.packages('plotly')" \
+        -e "install.packages('devtools')" \
+        -e "install.packages('BiocManager')" \
+        -e "BiocManager::install('pcaMethods')" \
+        -e "BiocManager::install('impute')" \
+        -e "devtools:install_github('eturkes/imputeLCMD-eturkes')" \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/ \
         /tmp/downloaded_packages/ \
