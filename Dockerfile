@@ -37,7 +37,7 @@ RUN apt-get update \
         -e "install.packages('BiocManager')" \
         -e "BiocManager::install('pcaMethods')" \
         -e "BiocManager::install('impute')" \
-        -e "devtools:install_github('eturkes/imputeLCMD-eturkes')" \
+        -e "devtools::install_github('eturkes/imputeLCMD-eturkes')" \
     && apt-get clean \
     && rm -Rf /var/lib/apt/lists/ \
         /tmp/downloaded_packages/ \
